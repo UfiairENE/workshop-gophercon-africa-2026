@@ -55,7 +55,11 @@
 			v.src = '/assets/video/hero.mp4';
 			v.addEventListener('playing', () => heroBox.classList.add('has-video'), { once: true });
 			heroBox.appendChild(v);
-			v.play().catch(() => {});
+			// Low Power Mode and data savers block autoplay; a touch lets it start.
+			v.play().catch(() => {
+				const retry = () => v.play().catch(() => {});
+				['touchend', 'click', 'keydown'].forEach((t) => window.addEventListener(t, retry, { once: true, passive: true }));
+			});
 		}).catch(() => {});
 	}
 
