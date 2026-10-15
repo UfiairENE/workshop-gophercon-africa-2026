@@ -14,10 +14,6 @@
 	--gutter: 16px;
 	--section: 90px;
 
-	--three-warm: #ffcf9e;
-	--three-cool: #babfff;
-	--three-bloom: #e3a2ef;
-	--three-sky: #bfe0f7;
 	--three-line: #3a3a3e;
 
 	--chart-line: #3a3a3e;
@@ -235,81 +231,9 @@ code {
 	color: var(--muted);
 }
 
-/* Sky chart */
+/* Legends */
 
-.sky {
-	margin: 0;
-}
-
-.sky__panel {
-	background: radial-gradient(ellipse at 30% 20%, #161a2b 0%, var(--carbon) 70%);
-	padding: clamp(8px, 2vw, 24px);
-}
-
-.sky__svg {
-	display: block;
-	width: 100%;
-	height: auto;
-}
-
-.sky__grid line {
-	stroke: rgba(255, 255, 255, 0.09);
-	stroke-width: 0.3;
-}
-
-.sky__grid .sky__equator {
-	stroke: rgba(255, 207, 158, 0.35);
-	stroke-dasharray: 1.5 1.5;
-}
-
-.star {
-	fill: var(--polar);
-	opacity: 0.9;
-	transition: r 0.15s ease-out, opacity 0.15s ease-out;
-}
-
-.star:hover {
-	r: 3;
-	opacity: 1;
-}
-
-.star--mammal {
-	fill: var(--polar);
-	color: var(--polar);
-}
-
-.star--bird {
-	fill: var(--apricot);
-	color: var(--apricot);
-}
-
-.star--reptile {
-	fill: var(--iris);
-	color: var(--iris);
-}
-
-.star--other {
-	fill: var(--fuchsia);
-	color: var(--fuchsia);
-}
-
-.star--twinkle {
-	animation: twinkle 3.2s ease-in-out infinite;
-}
-
-@keyframes twinkle {
-	50% {
-		opacity: 0.35;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.star--twinkle {
-		animation: none;
-	}
-}
-
-.sky__legend {
+.legend {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px 24px;
@@ -317,17 +241,17 @@ code {
 	font-size: 13px;
 }
 
-.sky__key {
+.legend__key {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
 }
 
-.sky__key b {
+.legend__key b {
 	font-weight: 500;
 }
 
-.sky__dot {
+.legend__dot {
 	display: inline-block;
 	flex: none;
 	width: 10px;
@@ -450,10 +374,6 @@ code {
 	border-bottom: 1px solid rgba(181, 176, 176, 0.6);
 }
 
-.catalogue tr:target td {
-	background: rgba(255, 207, 158, 0.45);
-}
-
 .catalogue small {
 	display: block;
 	color: var(--muted);
@@ -463,16 +383,6 @@ code {
 .catalogue__no {
 	color: var(--muted);
 	font-variant-numeric: tabular-nums;
-}
-
-.catalogue__photo img,
-.catalogue__nophoto {
-	display: block;
-	width: 56px;
-	aspect-ratio: 1;
-	height: auto;
-	object-fit: cover;
-	background: var(--polar);
 }
 
 .catalogue__body {
@@ -512,7 +422,7 @@ code {
 
 	.catalogue tr {
 		display: grid;
-		grid-template-columns: 56px minmax(0, 1fr);
+		grid-template-columns: minmax(0, 1fr);
 		gap: 4px 14px;
 		padding: 14px 0;
 		border-bottom: 1px solid rgba(181, 176, 176, 0.6);
@@ -521,24 +431,10 @@ code {
 	.catalogue td {
 		padding: 0;
 		border: 0;
-		grid-column: 2;
-	}
-
-	.catalogue .catalogue__photo {
-		grid-column: 1;
-		grid-row: 1 / span 5;
 	}
 
 	.catalogue .catalogue__no {
 		font-size: 12px;
-	}
-
-	.catalogue--plain tr {
-		grid-template-columns: minmax(0, 1fr);
-	}
-
-	.catalogue--plain td {
-		grid-column: 1;
 	}
 
 	.catalogue td[data-label]::before {

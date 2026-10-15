@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "workshop/internal/domain/sighting"
+import "workshop/internal/domain/body"
 
 func Sparkline(noun string, byYear map[int]int, first, last int) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -80,7 +80,7 @@ func Sparkline(noun string, byYear map[int]int, first, last int) templ.Component
 	})
 }
 
-func Bars(rows []sighting.Tally) templ.Component {
+func Bars(rows []body.Tally) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {

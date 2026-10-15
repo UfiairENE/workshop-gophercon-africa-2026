@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"workshop/internal/domain/sighting"
 )
 
 // The sparkline's drawing box, matching the viewBox in the templ.
@@ -68,14 +66,8 @@ func bar(count, longest int) map[string]string {
 	return map[string]string{"--bar": strconv.Itoa(count*100/longest) + "%"}
 }
 
-// TopBodies ranks the animals seen most often.
-func TopBodies(sightings []sighting.Sighting, n int) []sighting.Tally {
-	return sighting.Top(sighting.CountBy(sightings, func(s sighting.Sighting) string {
-		return displayName(s.Species)
-	}), n)
-}
 
-// BusiestYear is the year with the most sightings.
+// BusiestYear is the year with the most discoveries.
 func BusiestYear(byYear map[int]int) int {
 	y, _ := peak(byYear)
 	return y

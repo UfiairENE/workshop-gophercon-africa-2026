@@ -9,8 +9,7 @@ artwork hanging in the white space.
 
 - `/`, **Worlds**: planets and stars from the `body` domain (NASA Exoplanet Archive plus the
   bundled Solar System). Orrery banner, Portraits, Star map, Almanac, Nearest worlds.
-- `/sea`, **Sea life**: GBIF sightings filtered to marine animals (`seaLife` in
-  `handlers/sea.go`). Sky chart, Almanac, Catalogue.
+- Anything unmatched gets the error page with a 404 ("Nothing orbits here.").
 
 ## Colours (`:root` in `assets/css/app.css`)
 
@@ -18,7 +17,7 @@ artwork hanging in the white space.
 |---|---|---|
 | `--canvas` | `#ffffff` | Page background, cards |
 | `--ink` | `#3a3a3e` | Nearly all text, hairlines, orbit lines |
-| `--carbon` | `#090b11` | Headlines, the star map and sky chart panels |
+| `--carbon` | `#090b11` | Headlines, the star map panel |
 | `--ash` | `#b5b0b0` | Soft borders only, never text |
 | `--muted` | `#66666b` | Secondary text (5.7:1 on white) |
 | `--apricot` | `#ffcf9e` | Banner wash, warm plate, Sun, Sun-like stars |
@@ -52,7 +51,7 @@ wordmark. Never use positive letter-spacing.
   the page still scrolls.
 - `planet-material.js`: the shared banded pastel planet shader.
 - Hover: cards lift 4–6px, table rows tint `--polar`.
-- Reduced motion: scenes draw one still frame, and lifts and twinkles are off.
+- Reduced motion: scenes draw one still frame, and lifts are off.
 
 ## Avoid
 

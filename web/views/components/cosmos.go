@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"workshop/internal/domain/body"
-	"workshop/internal/domain/sighting"
 )
 
 // orbiter is one body circling the Sun in the orrery.
@@ -159,14 +158,14 @@ func Nearest(bodies []body.Body, n int) []body.Body {
 }
 
 // TopBy ranks exoplanets by key, as rows for Bars.
-func TopBy(bodies []body.Body, n int, key func(body.Body) string) []sighting.Tally {
+func TopBy(bodies []body.Body, n int, key func(body.Body) string) []body.Tally {
 	exo := slices.DeleteFunc(slices.Clone(bodies), func(b body.Body) bool { return b.Kind != body.KindExoplanet })
-	top := body.Top(body.CountBy(exo, key), n)
-	out := make([]sighting.Tally, len(top))
-	for i, t := range top {
-		out[i] = sighting.Tally(t)
-	}
-	return out
+	return body.Top(body.CountBy(exo, key), n)
+}
+
+// catalogueNo numbers a row like an entry in a printed catalogue.
+func catalogueNo(i int) string {
+	return fmt.Sprintf("%03d", i+1)
 }
 
 // Method is how a body was found, for TopBy.

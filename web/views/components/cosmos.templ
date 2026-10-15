@@ -49,17 +49,17 @@ templ StarMapPanel(bodies []body.Body) {
 			@ThreeScene(ThreeSceneProps{Scene: "starmap", Label: starMapLabel(len(systems))})
 			<p class="starmap__hint" aria-hidden="true">Drag to turn</p>
 		</div>
-		<figcaption class="sky__legend">
-			<span class="sky__key"><i class="sky__dot starmap__dot--hot" aria-hidden="true"></i>Hot blue-white stars</span>
-			<span class="sky__key"><i class="sky__dot starmap__dot--sun" aria-hidden="true"></i>Sun-like stars</span>
-			<span class="sky__key"><i class="sky__dot starmap__dot--cool" aria-hidden="true"></i>Cool red dwarfs</span>
-			<span class="sky__key"><i class="sky__dot starmap__dot--home" aria-hidden="true"></i>The Sun, at the centre</span>
+		<figcaption class="legend">
+			<span class="legend__key"><i class="legend__dot starmap__dot--hot" aria-hidden="true"></i>Hot blue-white stars</span>
+			<span class="legend__key"><i class="legend__dot starmap__dot--sun" aria-hidden="true"></i>Sun-like stars</span>
+			<span class="legend__key"><i class="legend__dot starmap__dot--cool" aria-hidden="true"></i>Cool red dwarfs</span>
+			<span class="legend__key"><i class="legend__dot starmap__dot--home" aria-hidden="true"></i>The Sun, at the centre</span>
 		</figcaption>
 	</figure>
 }
 
 templ NearestTable(bodies []body.Body) {
-	<table class="catalogue catalogue--plain">
+	<table class="catalogue">
 		<thead>
 			<tr>
 				<th scope="col">No.</th>
@@ -76,7 +76,7 @@ templ NearestTable(bodies []body.Body) {
 					<td class="catalogue__no">{ catalogueNo(i) }</td>
 					<td class="catalogue__body">
 						{{ colour, _ := heat(b.Physical.EquilibriumTempK) }}
-						<span class="sky__dot" style={ map[string]string{"color": colour} } aria-hidden="true"></span>
+						<span class="legend__dot" style={ map[string]string{"color": colour} } aria-hidden="true"></span>
 						<span>
 							<b>{ b.Name }</b>
 							<small>Orbits { b.Parent }</small>

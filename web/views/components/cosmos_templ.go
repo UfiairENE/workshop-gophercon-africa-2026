@@ -281,7 +281,7 @@ func StarMapPanel(bodies []body.Body) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<p class=\"starmap__hint\" aria-hidden=\"true\">Drag to turn</p></div><figcaption class=\"sky__legend\"><span class=\"sky__key\"><i class=\"sky__dot starmap__dot--hot\" aria-hidden=\"true\"></i>Hot blue-white stars</span> <span class=\"sky__key\"><i class=\"sky__dot starmap__dot--sun\" aria-hidden=\"true\"></i>Sun-like stars</span> <span class=\"sky__key\"><i class=\"sky__dot starmap__dot--cool\" aria-hidden=\"true\"></i>Cool red dwarfs</span> <span class=\"sky__key\"><i class=\"sky__dot starmap__dot--home\" aria-hidden=\"true\"></i>The Sun, at the centre</span></figcaption></figure>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<p class=\"starmap__hint\" aria-hidden=\"true\">Drag to turn</p></div><figcaption class=\"legend\"><span class=\"legend__key\"><i class=\"legend__dot starmap__dot--hot\" aria-hidden=\"true\"></i>Hot blue-white stars</span> <span class=\"legend__key\"><i class=\"legend__dot starmap__dot--sun\" aria-hidden=\"true\"></i>Sun-like stars</span> <span class=\"legend__key\"><i class=\"legend__dot starmap__dot--cool\" aria-hidden=\"true\"></i>Cool red dwarfs</span> <span class=\"legend__key\"><i class=\"legend__dot starmap__dot--home\" aria-hidden=\"true\"></i>The Sun, at the centre</span></figcaption></figure>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -310,7 +310,7 @@ func NearestTable(bodies []body.Body) templ.Component {
 			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<table class=\"catalogue catalogue--plain\"><thead><tr><th scope=\"col\">No.</th><th scope=\"col\">World</th><th scope=\"col\">Distance</th><th scope=\"col\">Found</th><th scope=\"col\">Found by</th><th scope=\"col\">Size</th></tr></thead> <tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<table class=\"catalogue\"><thead><tr><th scope=\"col\">No.</th><th scope=\"col\">World</th><th scope=\"col\">Distance</th><th scope=\"col\">Found</th><th scope=\"col\">Found by</th><th scope=\"col\">Size</th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -333,14 +333,14 @@ func NearestTable(bodies []body.Body) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			colour, _ := heat(b.Physical.EquilibriumTempK)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<span class=\"sky__dot\" style=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<span class=\"legend__dot\" style=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(map[string]string{"color": colour})
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/cosmos.templ`, Line: 79, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/cosmos.templ`, Line: 79, Col: 74}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {

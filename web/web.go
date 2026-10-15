@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"workshop/internal/domain/body"
-	"workshop/internal/domain/sighting"
 	"workshop/internal/infra/config"
 	"workshop/web/handlers"
 )
@@ -21,12 +20,11 @@ import (
 var assets embed.FS
 
 // New returns a ServeMux serving the static assets and handler's patterns.
-func New(logger *slog.Logger, config config.Config, sightingsSvc *sighting.Service, bodiesSvc *body.Service) *http.ServeMux {
+func New(logger *slog.Logger, config config.Config, bodiesSvc *body.Service) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.Handle("GET /assets/", http.FileServerFS(assetsFs(config.IsProduction())))
 	mux.Handle("GET /{$}", handlers.Home(logger, bodiesSvc))
-	mux.Handle("GET /sea", handlers.Sea(logger, sightingsSvc))
 	mux.Handle("GET /", http.HandlerFunc(handlers.NotFound(logger)))
 
 	return mux

@@ -1,6 +1,6 @@
 package components
 
-import "workshop/internal/domain/sighting"
+import "workshop/internal/domain/body"
 
 templ Sparkline(noun string, byYear map[int]int, first, last int) {
 	if len(byYear) > 0 && last >= first {
@@ -11,7 +11,7 @@ templ Sparkline(noun string, byYear map[int]int, first, last int) {
 	}
 }
 
-templ Bars(rows []sighting.Tally) {
+templ Bars(rows []body.Tally) {
 	if len(rows) > 0 {
 		<ol class="bars">
 			for _, row := range rows {
