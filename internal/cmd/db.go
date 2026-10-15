@@ -57,14 +57,17 @@ func dbCmd(app *app) *cli.Command {
 			},
 			{
 				Name:  "seed",
-				Usage: "Apply migrations and ingest a starter set of sightings of every recognised animal",
+				Usage: "Apply migrations, ingest a starter set of sightings of every recognised animal, and seed the planets and stars",
 				Action: func(ctx context.Context, _ *cli.Command) error {
 					if _, err := app.Migrations.Up(ctx); err != nil {
 						return fmt.Errorf("applying migrations: %w", err)
 					}
-					return runIngest(ctx, app, sighting.IngestRequest{
+					if err := runIngest(ctx, app, sighting.IngestRequest{
 						Limit: 500,
-					})
+					}); err != nil {
+						return err
+					}
+					return runBodySeed(ctx, app)
 				},
 			},
 			migrateCmd(app),

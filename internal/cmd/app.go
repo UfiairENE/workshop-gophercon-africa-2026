@@ -5,10 +5,13 @@ import (
 	"database/sql"
 	"log/slog"
 	"os"
+	"workshop/internal/clients/exoplanets"
 	"workshop/internal/clients/gbif"
 	"workshop/internal/clients/openmeteo"
 	"workshop/internal/common/logs"
 	"workshop/internal/common/printer"
+	"workshop/internal/domain/body"
+	"workshop/internal/domain/body/stores/bodysqlite"
 	"workshop/internal/domain/sighting"
 	"workshop/internal/domain/sighting/stores/sightingsqlite"
 	"workshop/internal/domain/species"
@@ -33,6 +36,7 @@ type app struct {
 	Sightings  *sighting.Service
 	Species    *species.Service
 	Weather    *weather.Service
+	Bodies     *body.Service
 
 	// live is set by --live, when GBIF and Open-Meteo are the real APIs
 	// rather than the local mock.
@@ -87,6 +91,8 @@ func bootstrap(ctx context.Context, cfg config.Config, level slog.Level, live bo
 		openm,
 	)
 
+	bodySvc := body.NewService(logger, bodysqlite.New(conn), exoplanets.New(exoplanets.BaseURL))
+
 	return &app{
 		Config:     cfg,
 		Logger:     logger,
@@ -96,6 +102,7 @@ func bootstrap(ctx context.Context, cfg config.Config, level slog.Level, live bo
 		Sightings:  sightingSvc,
 		Species:    speciesSvc,
 		Weather:    weatherSvc,
+		Bodies:     bodySvc,
 		live:       live,
 	}, teardown, nil
 }

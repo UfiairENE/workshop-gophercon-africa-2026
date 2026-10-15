@@ -1,7 +1,21 @@
 package layout
 
 type BaseProps struct {
-	Title string
+	Title       string
+	Description string
+	// Current is the nav link for this page, marked aria-current.
+	Current string
+}
+
+type navLink struct {
+	Name, Href string
+}
+
+var nav = []navLink{
+	{Name: "Worlds", Href: "/"},
+	{Name: "Star map", Href: "/#starmap"},
+	{Name: "Almanac", Href: "/#almanac"},
+	{Name: "Sea life", Href: "/sea"},
 }
 
 templ Base(props BaseProps) {
@@ -10,13 +24,59 @@ templ Base(props BaseProps) {
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<link rel="icon" href="/assets/images/logo.svg" type="image/svg+xml"/>
+			<link rel="manifest" href="/assets/manifest.json"/>
+			<meta name="theme-color" content="#ffffff"/>
 			<title>{ props.Title }</title>
+			if props.Description != "" {
+				<meta name="description" content={ props.Description }/>
+			}
+			<script>document.documentElement.classList.add('js')</script>
+			<script type="importmap">
+				{
+					"imports": {
+						"three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+						"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+					}
+				}
+			</script>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+			<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&display=swap"/>
 			<link rel="stylesheet" href="/assets/css/app.css"/>
+			<link rel="stylesheet" href="/assets/css/charts.css"/>
+			<link rel="stylesheet" href="/assets/css/threejs.css"/>
+			<link rel="stylesheet" href="/assets/css/reveal.css"/>
+			<script src="/assets/js/reveal.js" defer></script>
 		</head>
 		<body>
-			<main class="container">
+			<a class="skip" href="#main">Skip to content</a>
+			<header class="site-header">
+				<div class="wrap site-header__inner">
+					<a class="logo" href="/">
+						<img src="/assets/images/logo.svg" alt="Earthbound Observatory, home" width="32" height="32"/>
+						<span class="logo__word" aria-hidden="true">Earthbound<br/>Observatory</span>
+					</a>
+					<nav class="nav" aria-label="Main">
+						for _, l := range nav {
+							if l.Name == props.Current {
+								<a href={ templ.URL(l.Href) } aria-current="page">{ l.Name }</a>
+							} else {
+								<a href={ templ.URL(l.Href) }>{ l.Name }</a>
+							}
+						}
+					</nav>
+				</div>
+			</header>
+			<main id="main">
 				{ children... }
 			</main>
+			<footer class="site-footer">
+				<div class="wrap site-footer__inner">
+					<p>Earthbound Observatory</p>
+					<p>Worlds from the <a href="https://exoplanetarchive.ipac.caltech.edu" rel="noopener">NASA Exoplanet Archive</a>. Sea life from <a href="https://www.gbif.org" rel="noopener">GBIF</a>.</p>
+				</div>
+			</footer>
 			<script src="/assets/js/app.js"></script>
 		</body>
 	</html>

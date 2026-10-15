@@ -1,27 +1,94 @@
 package pages
 
 import (
-	"workshop/internal/domain/sighting"
+	"workshop/internal/domain/body"
 	"workshop/web/views/components"
 	"workshop/web/views/layout"
 )
 
-templ Home(sightings []sighting.Sighting) {
+templ Home(bodies []body.Body) {
+	{{ sum := body.Summarise(bodies) }}
+	{{ byYear := body.CountByYear(bodies) }}
 	@layout.Base(layout.BaseProps{
-		Title: "Sightings",
+		Title:       "Earthbound Observatory",
+		Description: "Every known world: our Solar System and thousands of planets around other stars, charted from NASA's Exoplanet Archive.",
+		Current:     "Worlds",
 	}) {
-		<h1>Sightings</h1>
-		if len(sightings) == 0 {
-			<p>No sightings have been ingested yet.</p>
-		} else {
-			<p>Total: { len(sightings) }</p>
-			<ul class="sightings">
-				for _, s := range sightings {
-					<li>
-						@components.SightingCard(s)
-					</li>
+		<section class="hero hero--orrery" data-scroll-scene>
+			<div class="wrap hero__copy">
+				<p class="eyebrow">An atlas of known worlds</p>
+				<h1 class="hero__title">Every world we know, charted.</h1>
+				if sum.Exoplanets > 0 {
+					<p class="hero__lede">Eight planets at home, and { sum.Exoplanets } more around other stars, found by { sum.Facilities } observatories since { sum.FirstYear }.</p>
 				}
-			</ul>
+			</div>
+			<div class="hero__orrery">
+				@components.OrreryScene(bodies)
+			</div>
+		</section>
+		if len(bodies) == 0 {
+			<section class="section">
+				<div class="wrap">
+					<h2 class="section__title">The sky is empty tonight</h2>
+					<p>No bodies have been catalogued yet. Run <code>go run . bodies seed</code> and refresh.</p>
+				</div>
+			</section>
+		} else {
+			<section class="section reveal" id="worlds" aria-labelledby="worlds-title">
+				<div class="wrap">
+					<header class="section__head">
+						<h2 class="section__title" id="worlds-title">Portraits</h2>
+						<p class="section__lede">Our neighbours, and a few famous strangers. Hover one to set it spinning. Strangers are coloured by how hot they run, from lilac to pink.</p>
+					</header>
+					@components.PortraitGrid(components.Portraits(bodies))
+				</div>
+			</section>
+			<section class="section reveal" id="starmap" aria-labelledby="starmap-title" data-scroll-scene>
+				<div class="wrap">
+					<header class="section__head">
+						<h2 class="section__title" id="starmap-title">Star map</h2>
+						<p class="section__lede">Every star known to have planets, at its real direction from Earth, nearer ones closer in. Scroll to fly through, drag to turn.</p>
+					</header>
+					@components.StarMapPanel(bodies)
+				</div>
+			</section>
+			<section class="section reveal" id="almanac" aria-labelledby="almanac-title">
+				<div class="wrap">
+					<header class="section__head">
+						<h2 class="section__title" id="almanac-title">Almanac</h2>
+					</header>
+					<dl class="figures">
+						<div><dt>Exoplanets</dt><dd>{ sum.Exoplanets }</dd></div>
+						<div><dt>Star systems</dt><dd>{ sum.Systems }</dd></div>
+						<div><dt>Observatories</dt><dd>{ sum.Facilities }</dd></div>
+						<div><dt>Nearest, light years</dt><dd>{ components.LightYears(sum.NearestParsecs) }</dd></div>
+					</dl>
+					<div class="plates plates--three">
+						<article class="plate plate--warm">
+							<h3>Found per year</h3>
+							<p>{ sum.FirstYear } to { sum.LatestYear }, busiest in { components.BusiestYear(byYear) }</p>
+							@components.Sparkline("Exoplanets found", byYear, sum.FirstYear, sum.LatestYear)
+						</article>
+						<article class="plate plate--cool">
+							<h3>How they were found</h3>
+							@components.Bars(components.TopBy(bodies, 5, components.Method))
+						</article>
+						<article class="plate plate--bloom">
+							<h3>Who found the most</h3>
+							@components.Bars(components.TopBy(bodies, 5, components.Facility))
+						</article>
+					</div>
+				</div>
+			</section>
+			<section class="section reveal" id="nearest" aria-labelledby="nearest-title">
+				<div class="wrap">
+					<header class="section__head">
+						<h2 class="section__title" id="nearest-title">Nearest worlds</h2>
+						<p class="section__lede">The twenty planets closest to us beyond the Sun. A light year is about 9.5 trillion kilometres.</p>
+					</header>
+					@components.NearestTable(components.Nearest(bodies, 20))
+				</div>
+			</section>
 		}
 	}
 }

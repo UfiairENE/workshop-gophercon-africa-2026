@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+	<style>
+		.orbit { fill: none; stroke: #3a3a3e; }
+		.core { fill: #3a3a3e; }
+		.moon { fill: #ffcf9e; stroke: #3a3a3e; }
+		@media (prefers-color-scheme: dark) {
+			.orbit { stroke: #ffffff; }
+			.core { fill: #ffffff; }
+			.moon { stroke: #ffffff; }
+		}
+	</style>
+	<circle class="orbit" cx="32" cy="32" r="22" stroke-width="4"/>
+	<circle class="core" cx="32" cy="32" r="6"/>
+	<circle class="moon" cx="47.6" cy="16.4" r="8" stroke-width="4"/>
+</svg>

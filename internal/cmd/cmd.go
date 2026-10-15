@@ -33,7 +33,7 @@ func Run() {
 
 	cmd := &cli.Command{
 		Name:                  "workshop",
-		Usage:                 "Explore wildlife sightings from GBIF",
+		Usage:                 "Explore wildlife sightings from GBIF, and every known planet and star",
 		EnableShellCompletion: true,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
@@ -97,6 +97,7 @@ func commands(app *app) []*cli.Command {
 		speciesCmd(app),
 		statsCmd(app),
 		animalsCmd(app),
+		bodiesCmd(app),
 		webCmd(app),
 		dbCmd(app),
 	}
@@ -149,6 +150,7 @@ var restartCommands = []string{
 	"db reset",
 	"db seed",
 	"sightings ingest",
+	"bodies seed",
 }
 
 // runPicked asks for the command's flags, if it has a prompt, and runs

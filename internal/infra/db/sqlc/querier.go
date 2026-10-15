@@ -11,6 +11,11 @@ import (
 )
 
 type Querier interface {
+	BodyCreate(ctx context.Context, arg BodyCreateParams) (int64, error)
+	BodyFind(ctx context.Context, id uuid.UUID) (Body, error)
+	BodyFindByKey(ctx context.Context, catalogueKey string) (Body, error)
+	BodyFindByName(ctx context.Context, name string) (Body, error)
+	BodyList(ctx context.Context, arg BodyListParams) ([]Body, error)
 	SightingCreate(ctx context.Context, arg SightingCreateParams) (Sighting, error)
 	SightingFind(ctx context.Context, id uuid.UUID) (SightingFindRow, error)
 	SightingFindByGbifKey(ctx context.Context, gbifKey int64) (SightingFindByGbifKeyRow, error)

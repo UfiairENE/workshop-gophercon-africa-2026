@@ -17,3 +17,10 @@ func renderError(ctx context.Context, w http.ResponseWriter, logger *slog.Logger
 		logger.ErrorContext(ctx, "handlers: rendering error page: "+err.Error())
 	}
 }
+
+// NotFound renders the error page for any path no other route matches.
+func NotFound(logger *slog.Logger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		renderError(r.Context(), w, logger, http.StatusNotFound, "Nothing orbits here.")
+	}
+}

@@ -1,0 +1,104 @@
+package components
+
+import "workshop/internal/domain/body"
+
+templ OrreryScene(bodies []body.Body) {
+	{{ orbits := Orrery(bodies) }}
+	@templ.JSONScript("orrery-data", orbits)
+	@ThreeScene(ThreeSceneProps{Scene: "orrery", Label: orreryLabel(orbits)})
+}
+
+templ PortraitGrid(portraits []Portrait) {
+	<div class="portraits" data-portraits>
+		@ThreeScene(ThreeSceneProps{Scene: "portraits", Backdrop: true})
+		<ul class="portraits__grid">
+			for _, p := range portraits {
+				<li class="portrait">
+					<div
+						class="portrait__view"
+						data-colour={ p.Colour }
+						data-accent={ p.Accent }
+						data-bands={ num(p.Bands) }
+						data-ring?={ p.Ring }
+						data-kind={ string(p.Body.Kind) }
+						aria-hidden="true"
+					></div>
+					<h3 class="portrait__name">{ p.Body.Name }</h3>
+					<p class="portrait__meta">
+						if p.Body.InSolarSystem() {
+							{ p.Body.Kind.String() } · { found(p.Body) }
+						} else {
+							Orbits { p.Body.Parent } · { bodyDistance(p.Body) }
+						}
+					</p>
+					<dl class="portrait__facts">
+						<div><dt>Size</dt><dd>{ times(p.Body.Physical.RadiusEarth) } Earth</dd></div>
+						<div><dt>Year</dt><dd>{ yearLength(p.Body.Orbit.PeriodDays) }</dd></div>
+					</dl>
+				</li>
+			}
+		</ul>
+	</div>
+}
+
+templ StarMapPanel(bodies []body.Body) {
+	{{ systems := StarMap(bodies) }}
+	<figure class="starmap">
+		<div class="starmap__panel">
+			@templ.JSONScript("starmap-data", systems)
+			@ThreeScene(ThreeSceneProps{Scene: "starmap", Label: starMapLabel(len(systems))})
+			<p class="starmap__hint" aria-hidden="true">Drag to turn</p>
+		</div>
+		<figcaption class="sky__legend">
+			<span class="sky__key"><i class="sky__dot starmap__dot--hot" aria-hidden="true"></i>Hot blue-white stars</span>
+			<span class="sky__key"><i class="sky__dot starmap__dot--sun" aria-hidden="true"></i>Sun-like stars</span>
+			<span class="sky__key"><i class="sky__dot starmap__dot--cool" aria-hidden="true"></i>Cool red dwarfs</span>
+			<span class="sky__key"><i class="sky__dot starmap__dot--home" aria-hidden="true"></i>The Sun, at the centre</span>
+		</figcaption>
+	</figure>
+}
+
+templ NearestTable(bodies []body.Body) {
+	<table class="catalogue catalogue--plain">
+		<thead>
+			<tr>
+				<th scope="col">No.</th>
+				<th scope="col">World</th>
+				<th scope="col">Distance</th>
+				<th scope="col">Found</th>
+				<th scope="col">Found by</th>
+				<th scope="col">Size</th>
+			</tr>
+		</thead>
+		<tbody>
+			for i, b := range bodies {
+				<tr>
+					<td class="catalogue__no">{ catalogueNo(i) }</td>
+					<td class="catalogue__body">
+						{{ colour, _ := heat(b.Physical.EquilibriumTempK) }}
+						<span class="sky__dot" style={ map[string]string{"color": colour} } aria-hidden="true"></span>
+						<span>
+							<b>{ b.Name }</b>
+							<small>Orbits { b.Parent }</small>
+						</span>
+					</td>
+					<td data-label="Distance">{ bodyDistance(b) }</td>
+					<td data-label="Found">
+						{ year(b.Discovery.Year) }
+						if b.Discovery.Method != "" {
+							<small>{ b.Discovery.Method }</small>
+						}
+					</td>
+					<td data-label="Found by">
+						if b.Discovery.By != "" {
+							{ b.Discovery.By }
+						} else {
+							<span class="muted">Not recorded</span>
+						}
+					</td>
+					<td data-label="Size">{ times(b.Physical.RadiusEarth) } Earth</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}

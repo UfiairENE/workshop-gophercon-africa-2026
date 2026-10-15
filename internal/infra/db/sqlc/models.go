@@ -10,6 +10,32 @@ import (
 	"uuid"
 )
 
+type Body struct {
+	ID                uuid.UUID `db:"id" json:"id"`
+	CreatedAt         time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt         time.Time `db:"updated_at" json:"updated_at"`
+	CatalogueKey      string    `db:"catalogue_key" json:"catalogue_key"`
+	Name              string    `db:"name" json:"name"`
+	Kind              string    `db:"kind" json:"kind"`
+	System            string    `db:"system" json:"system"`
+	Parent            string    `db:"parent" json:"parent"`
+	PlanetsInSystem   *int      `db:"planets_in_system" json:"planets_in_system"`
+	DiscoveredYear    *int      `db:"discovered_year" json:"discovered_year"`
+	DiscoveredBy      string    `db:"discovered_by" json:"discovered_by"`
+	DiscoveryMethod   string    `db:"discovery_method" json:"discovery_method"`
+	RadiusEarth       *float64  `db:"radius_earth" json:"radius_earth"`
+	MassEarth         *float64  `db:"mass_earth" json:"mass_earth"`
+	OrbitalPeriodDays *float64  `db:"orbital_period_days" json:"orbital_period_days"`
+	SemiMajorAxisAu   *float64  `db:"semi_major_axis_au" json:"semi_major_axis_au"`
+	EquilibriumTempK  *float64  `db:"equilibrium_temp_k" json:"equilibrium_temp_k"`
+	StarSpectralType  string    `db:"star_spectral_type" json:"star_spectral_type"`
+	StarTempK         *float64  `db:"star_temp_k" json:"star_temp_k"`
+	StarRadiusSun     *float64  `db:"star_radius_sun" json:"star_radius_sun"`
+	RightAscensionDeg *float64  `db:"right_ascension_deg" json:"right_ascension_deg"`
+	DeclinationDeg    *float64  `db:"declination_deg" json:"declination_deg"`
+	DistanceParsecs   *float64  `db:"distance_parsecs" json:"distance_parsecs"`
+}
+
 type Sighting struct {
 	ID                            uuid.UUID `db:"id" json:"id"`
 	CreatedAt                     time.Time `db:"created_at" json:"created_at"`

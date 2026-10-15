@@ -1,0 +1,35 @@
+[
+	{ "name": "Sun", "kind": "star", "radiusEarth": 109.1, "massEarth": 333000, "spectralType": "G2 V", "starTempK": 5772, "starRadiusSun": 1 },
+
+	{ "name": "Mercury", "kind": "planet", "parent": "Sun", "radiusEarth": 0.383, "massEarth": 0.0553, "orbitalPeriodDays": 87.97, "semiMajorAxisAU": 0.387, "tempK": 440 },
+	{ "name": "Venus", "kind": "planet", "parent": "Sun", "radiusEarth": 0.949, "massEarth": 0.815, "orbitalPeriodDays": 224.7, "semiMajorAxisAU": 0.723, "tempK": 232 },
+	{ "name": "Earth", "kind": "planet", "parent": "Sun", "radiusEarth": 1, "massEarth": 1, "orbitalPeriodDays": 365.256, "semiMajorAxisAU": 1, "tempK": 255 },
+	{ "name": "Mars", "kind": "planet", "parent": "Sun", "radiusEarth": 0.532, "massEarth": 0.107, "orbitalPeriodDays": 686.98, "semiMajorAxisAU": 1.524, "tempK": 210 },
+	{ "name": "Jupiter", "kind": "planet", "parent": "Sun", "radiusEarth": 11.21, "massEarth": 317.8, "orbitalPeriodDays": 4332.6, "semiMajorAxisAU": 5.203, "tempK": 110 },
+	{ "name": "Saturn", "kind": "planet", "parent": "Sun", "radiusEarth": 9.45, "massEarth": 95.16, "orbitalPeriodDays": 10759, "semiMajorAxisAU": 9.537, "tempK": 81 },
+	{ "name": "Uranus", "kind": "planet", "parent": "Sun", "radiusEarth": 4.01, "massEarth": 14.54, "orbitalPeriodDays": 30687, "semiMajorAxisAU": 19.19, "tempK": 58, "discoveredYear": 1781, "discoveredBy": "William Herschel" },
+	{ "name": "Neptune", "kind": "planet", "parent": "Sun", "radiusEarth": 3.88, "massEarth": 17.15, "orbitalPeriodDays": 60190, "semiMajorAxisAU": 30.07, "tempK": 46, "discoveredYear": 1846, "discoveredBy": "Johann Galle and Urbain Le Verrier" },
+
+	{ "name": "Ceres", "kind": "dwarf_planet", "parent": "Sun", "radiusEarth": 0.0738, "massEarth": 0.00016, "orbitalPeriodDays": 1680, "semiMajorAxisAU": 2.77, "discoveredYear": 1801, "discoveredBy": "Giuseppe Piazzi" },
+	{ "name": "Pluto", "kind": "dwarf_planet", "parent": "Sun", "radiusEarth": 0.186, "massEarth": 0.0022, "orbitalPeriodDays": 90560, "semiMajorAxisAU": 39.48, "tempK": 44, "discoveredYear": 1930, "discoveredBy": "Clyde Tombaugh" },
+	{ "name": "Haumea", "kind": "dwarf_planet", "parent": "Sun", "radiusEarth": 0.122, "massEarth": 0.00066, "orbitalPeriodDays": 103774, "semiMajorAxisAU": 43.2, "discoveredYear": 2004, "discoveredBy": "Sierra Nevada Observatory" },
+	{ "name": "Makemake", "kind": "dwarf_planet", "parent": "Sun", "radiusEarth": 0.112, "massEarth": 0.0005, "orbitalPeriodDays": 111845, "semiMajorAxisAU": 45.8, "discoveredYear": 2005, "discoveredBy": "Palomar Observatory" },
+	{ "name": "Eris", "kind": "dwarf_planet", "parent": "Sun", "radiusEarth": 0.183, "massEarth": 0.0028, "orbitalPeriodDays": 203830, "semiMajorAxisAU": 67.8, "discoveredYear": 2005, "discoveredBy": "Palomar Observatory" },
+
+	{ "name": "Moon", "kind": "moon", "parent": "Earth", "radiusEarth": 0.273, "massEarth": 0.0123, "orbitalPeriodDays": 27.32 },
+	{ "name": "Phobos", "kind": "moon", "parent": "Mars", "radiusEarth": 0.00177, "massEarth": 0.0000000018, "orbitalPeriodDays": 0.319, "discoveredYear": 1877, "discoveredBy": "Asaph Hall" },
+	{ "name": "Deimos", "kind": "moon", "parent": "Mars", "radiusEarth": 0.00097, "massEarth": 0.00000000024, "orbitalPeriodDays": 1.263, "discoveredYear": 1877, "discoveredBy": "Asaph Hall" },
+	{ "name": "Io", "kind": "moon", "parent": "Jupiter", "radiusEarth": 0.286, "massEarth": 0.015, "orbitalPeriodDays": 1.769, "discoveredYear": 1610, "discoveredBy": "Galileo Galilei" },
+	{ "name": "Europa", "kind": "moon", "parent": "Jupiter", "radiusEarth": 0.245, "massEarth": 0.008, "orbitalPeriodDays": 3.551, "discoveredYear": 1610, "discoveredBy": "Galileo Galilei" },
+	{ "name": "Ganymede", "kind": "moon", "parent": "Jupiter", "radiusEarth": 0.413, "massEarth": 0.025, "orbitalPeriodDays": 7.155, "discoveredYear": 1610, "discoveredBy": "Galileo Galilei" },
+	{ "name": "Callisto", "kind": "moon", "parent": "Jupiter", "radiusEarth": 0.378, "massEarth": 0.018, "orbitalPeriodDays": 16.689, "discoveredYear": 1610, "discoveredBy": "Galileo Galilei" },
+	{ "name": "Titan", "kind": "moon", "parent": "Saturn", "radiusEarth": 0.404, "massEarth": 0.0225, "orbitalPeriodDays": 15.945, "discoveredYear": 1655, "discoveredBy": "Christiaan Huygens" },
+	{ "name": "Enceladus", "kind": "moon", "parent": "Saturn", "radiusEarth": 0.0396, "massEarth": 0.000018, "orbitalPeriodDays": 1.37, "discoveredYear": 1789, "discoveredBy": "William Herschel" },
+	{ "name": "Rhea", "kind": "moon", "parent": "Saturn", "radiusEarth": 0.12, "massEarth": 0.00039, "orbitalPeriodDays": 4.518, "discoveredYear": 1672, "discoveredBy": "Giovanni Cassini" },
+	{ "name": "Iapetus", "kind": "moon", "parent": "Saturn", "radiusEarth": 0.115, "massEarth": 0.0003, "orbitalPeriodDays": 79.32, "discoveredYear": 1671, "discoveredBy": "Giovanni Cassini" },
+	{ "name": "Miranda", "kind": "moon", "parent": "Uranus", "radiusEarth": 0.037, "massEarth": 0.000011, "orbitalPeriodDays": 1.413, "discoveredYear": 1948, "discoveredBy": "Gerard Kuiper" },
+	{ "name": "Titania", "kind": "moon", "parent": "Uranus", "radiusEarth": 0.124, "massEarth": 0.00059, "orbitalPeriodDays": 8.706, "discoveredYear": 1787, "discoveredBy": "William Herschel" },
+	{ "name": "Oberon", "kind": "moon", "parent": "Uranus", "radiusEarth": 0.1195, "massEarth": 0.00051, "orbitalPeriodDays": 13.46, "discoveredYear": 1787, "discoveredBy": "William Herschel" },
+	{ "name": "Triton", "kind": "moon", "parent": "Neptune", "radiusEarth": 0.212, "massEarth": 0.00359, "orbitalPeriodDays": 5.877, "discoveredYear": 1846, "discoveredBy": "William Lassell" },
+	{ "name": "Charon", "kind": "moon", "parent": "Pluto", "radiusEarth": 0.0951, "massEarth": 0.00027, "orbitalPeriodDays": 6.387, "discoveredYear": 1978, "discoveredBy": "James Christy" }
+]
