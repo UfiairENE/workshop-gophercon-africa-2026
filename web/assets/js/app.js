@@ -1,4 +1,18 @@
 (function () {
+	const menu = document.querySelector('[data-menu]');
+	if (menu) {
+		const nav = document.getElementById(menu.getAttribute('aria-controls'));
+		const set = (open) => {
+			menu.setAttribute('aria-expanded', String(open));
+			document.body.classList.toggle('menu-open', open);
+		};
+		menu.addEventListener('click', () => set(menu.getAttribute('aria-expanded') !== 'true'));
+		nav.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') { set(false); menu.focus(); }
+		});
+	}
+
 	const box = document.getElementById('lightbox');
 	document.querySelectorAll('[data-lightbox]').forEach((t) => {
 		t.addEventListener('click', () => {

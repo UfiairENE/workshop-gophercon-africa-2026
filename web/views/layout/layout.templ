@@ -45,12 +45,15 @@ templ Base(props BaseProps) {
 			<header class="header">
 				<div class="header__inner">
 					<a class="brand" href="/">Rafiki</a>
-					<nav class="mainnav" aria-label="Main">
+					<button type="button" class="menu-toggle" aria-expanded="false" aria-controls="mainnav" data-menu>
+						<span class="menu-toggle__bars" aria-hidden="true"><i></i><i></i><i></i></span>
+						<span class="sr-only">Menu</span>
+					</button>
+					<nav class="mainnav" id="mainnav" aria-label="Main">
 						for _, n := range nav {
 							<a href={ templ.URL(n.Href) } aria-current?={ n.Key == props.Active }>{ n.Label }</a>
 						}
 					</nav>
-					
 					<a class="btn-orange header__cta" href="/map">Explore the map</a>
 				</div>
 			</header>
