@@ -225,7 +225,10 @@
 				grid.append(b);
 			});
 			stage.append(prompt, grid, feedback);
-			if (player) { player.focus(); player.click(); } else grid.querySelector('button').focus();
+			if (status.getBoundingClientRect().top < 0 || prompt.getBoundingClientRect().bottom > window.innerHeight) {
+				status.scrollIntoView({ block: 'start', behavior: 'smooth' });
+			}
+			if (player) { player.focus({ preventScroll: true }); player.click(); } else grid.querySelector('button').focus({ preventScroll: true });
 		}
 
 		function begin() {

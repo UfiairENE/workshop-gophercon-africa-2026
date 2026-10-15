@@ -222,10 +222,10 @@ a.bars__label:hover { color: var(--orange); }
 }
 
 /* quiz */
-.quiz__status { font-weight: 600; color: var(--brown); margin: 32px 0 16px; }
-.quiz { display: grid; gap: 28px; justify-items: start; }
-.quiz__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; width: 100%; max-width: 960px; }
-.quiz__opt { all: unset; cursor: pointer; display: block; border: 3px solid transparent; background: var(--stone); transition: transform .2s, border-color .2s; }
+.quiz__status { font-weight: 600; color: var(--brown); margin: 32px 0 16px; scroll-margin-top: 80px; }
+.quiz { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; justify-items: start; }
+.quiz__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(160px, 40%), 1fr)); gap: 16px; width: 100%; max-width: 960px; }
+.quiz__opt { all: unset; box-sizing: border-box; cursor: pointer; display: block; border: 3px solid transparent; background: var(--stone); transition: transform .2s, border-color .2s; }
 .quiz__opt:hover:not(:disabled) { transform: translateY(-4px); border-color: var(--orange); }
 .quiz__opt:focus-visible { outline: 3px solid var(--orange); }
 .quiz__opt img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
@@ -434,7 +434,7 @@ a.bars__label:hover { color: var(--orange); }
 .quiz__clue { margin: 0; padding: 28px 32px; background: var(--charcoal); color: #fff; border-radius: 8px; font: 400 2.6rem/1.4 var(--serif); }
 .quiz__photo { width: 100%; max-width: 760px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
 .quiz__names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; max-width: 760px; }
-.quiz__name { all: unset; cursor: pointer; padding: 18px 20px; border: 3px solid var(--line); background: #fff; font: 600 2rem var(--raleway); text-transform: capitalize; transition: border-color .2s, background .2s; }
+.quiz__name { all: unset; box-sizing: border-box; cursor: pointer; padding: 18px 20px; border: 3px solid var(--line); background: #fff; font: 600 2rem var(--raleway); text-transform: capitalize; transition: border-color .2s, background .2s; }
 .quiz__name:hover:not(:disabled) { border-color: var(--orange); }
 .quiz__name:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 .quiz__name.is-right { border-color: var(--turquoise); background: #dff1ef; }
