@@ -15,9 +15,9 @@ type Store interface {
 	Find(ctx context.Context, id uuid.UUID) (Body, error)
 	FindByName(ctx context.Context, name string) (Body, error)
 	List(ctx context.Context, filter ListFilter) ([]Body, error)
-	// CreateMany saves bodies in one go, skipping any whose Key is
+	// SaveMany saves bodies in one go, refreshing any whose Key is
 	// already stored, and reports how many it added.
-	CreateMany(ctx context.Context, in []CreateParams) (int, error)
+	SaveMany(ctx context.Context, in []CreateParams) (int, error)
 }
 
 // ExoplanetSource fetches the live archive, for seeding with --live.
@@ -88,8 +88,9 @@ type SeedResult struct {
 	Added int
 }
 
-// Seed saves the Solar System and every confirmed exoplanet. It's safe
-// to run again: bodies already stored are skipped.
+// Seed saves the Solar System, every confirmed exoplanet and the stars
+// they orbit. It's safe to run again: bodies already stored are refreshed
+// rather than duplicated.
 func (s *Service) Seed(ctx context.Context, req SeedRequest) (SeedResult, error) {
 	sol, err := solarsystem.Bodies()
 	if err != nil {
@@ -106,11 +107,17 @@ func (s *Service) Seed(ctx context.Context, req SeedRequest) (SeedResult, error)
 		return SeedResult{}, err
 	}
 
-	params := make([]CreateParams, 0, len(sol)+len(planets))
+	params := make([]CreateParams, 0, len(sol)+len(planets)*2)
 	for _, b := range sol {
 		params = append(params, fromSolarSystem(b))
 	}
+	hosts := map[string]bool{}
 	for _, p := range planets {
+		// Each system's star is saved once, from its first planet's row.
+		if !hosts[p.Host] {
+			hosts[p.Host] = true
+			params = append(params, starOf(p))
+		}
 		params = append(params, fromExoplanet(p))
 	}
 	for _, p := range params {
@@ -119,7 +126,7 @@ func (s *Service) Seed(ctx context.Context, req SeedRequest) (SeedResult, error)
 		}
 	}
 
-	added, err := s.store.CreateMany(ctx, params)
+	added, err := s.store.SaveMany(ctx, params)
 	if err != nil {
 		return SeedResult{}, err
 	}
@@ -164,11 +171,24 @@ func fromSolarSystem(b solarsystem.Body) CreateParams {
 			SemiMajorAxisAU: b.SemiMajorAxisAU,
 		},
 		Star: Star{
-			SpectralType: b.SpectralType,
-			TempK:        b.StarTempK,
-			RadiusSun:    b.StarRadiusSun,
+			SpectralType:  b.SpectralType,
+			TempK:         b.StarTempK,
+			RadiusSun:     b.StarRadiusSun,
+			MassSun:       b.StarMassSun,
+			AgeGyr:        b.StarAgeGyr,
+			LuminosityLog: sunLuminosity(b),
 		},
+		Sky: Sky{ApparentMagnitude: b.ApparentMagnitude},
 	}
+}
+
+// sunLuminosity is 0, the Sun's own, for the Sun and nothing for the rest.
+func sunLuminosity(b solarsystem.Body) *float64 {
+	if b.Kind != string(KindStar) {
+		return nil
+	}
+	zero := 0.0
+	return &zero
 }
 
 func fromExoplanet(p exoplanets.Planet) CreateParams {
@@ -179,6 +199,7 @@ func fromExoplanet(p exoplanets.Planet) CreateParams {
 		System:          p.Host,
 		Parent:          p.Host,
 		PlanetsInSystem: p.PlanetsInSystem,
+		StarsInSystem:   p.StarsInSystem,
 		Discovery: Discovery{
 			Year:   p.DiscoveryYear,
 			By:     p.DiscoveryFacility,
@@ -193,15 +214,61 @@ func fromExoplanet(p exoplanets.Planet) CreateParams {
 			PeriodDays:      p.OrbitalPeriodDays,
 			SemiMajorAxisAU: p.SemiMajorAxisAU,
 		},
-		Star: Star{
-			SpectralType: p.StarSpectralType,
-			TempK:        p.StarTempK,
-			RadiusSun:    p.StarRadiusSun,
+		Star: starFields(p),
+		Sky:  skyFields(p),
+	}
+}
+
+// starOf is the star an exoplanet orbits, as a body of its own.
+func starOf(p exoplanets.Planet) CreateParams {
+	var names []string
+	for _, n := range []string{p.HDName, p.HIPName} {
+		if n != "" && n != p.Host {
+			names = append(names, n)
+		}
+	}
+	return CreateParams{
+		Key:             "star:" + p.Host,
+		Name:            p.Host,
+		Kind:            KindStar,
+		System:          p.Host,
+		PlanetsInSystem: p.PlanetsInSystem,
+		StarsInSystem:   p.StarsInSystem,
+		CatalogueNames:  names,
+		Physical: Physical{
+			RadiusEarth: sunRadiiToEarth(p.StarRadiusSun),
 		},
-		Sky: Sky{
-			RightAscension:  p.RightAscension,
-			Declination:     p.Declination,
-			DistanceParsecs: p.DistanceParsecs,
-		},
+		Star: starFields(p),
+		Sky:  skyFields(p),
+	}
+}
+
+// sunRadiiToEarth converts a star's radius to Earth radii, the unit every
+// body's size is kept in.
+func sunRadiiToEarth(r *float64) *float64 {
+	if r == nil {
+		return nil
+	}
+	v := *r * 109.1
+	return &v
+}
+
+func starFields(p exoplanets.Planet) Star {
+	return Star{
+		SpectralType:  p.StarSpectralType,
+		TempK:         p.StarTempK,
+		RadiusSun:     p.StarRadiusSun,
+		MassSun:       p.StarMassSun,
+		AgeGyr:        p.StarAgeGyr,
+		LuminosityLog: p.StarLuminosityLog,
+	}
+}
+
+func skyFields(p exoplanets.Planet) Sky {
+	return Sky{
+		RightAscension:    p.RightAscension,
+		Declination:       p.Declination,
+		DistanceParsecs:   p.DistanceParsecs,
+		ApparentMagnitude: p.ApparentMagnitude,
 	}
 }

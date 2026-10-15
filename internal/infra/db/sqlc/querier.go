@@ -11,11 +11,13 @@ import (
 )
 
 type Querier interface {
-	BodyCreate(ctx context.Context, arg BodyCreateParams) (int64, error)
+	BodyCount(ctx context.Context) (int64, error)
 	BodyFind(ctx context.Context, id uuid.UUID) (Body, error)
 	BodyFindByKey(ctx context.Context, catalogueKey string) (Body, error)
 	BodyFindByName(ctx context.Context, name string) (Body, error)
 	BodyList(ctx context.Context, arg BodyListParams) ([]Body, error)
+	// Seeding again refreshes what the catalogue says, keeping each body's ID.
+	BodyUpsert(ctx context.Context, arg BodyUpsertParams) error
 	SightingCreate(ctx context.Context, arg SightingCreateParams) (Sighting, error)
 	SightingFind(ctx context.Context, id uuid.UUID) (SightingFindRow, error)
 	SightingFindByGbifKey(ctx context.Context, gbifKey int64) (SightingFindByGbifKeyRow, error)

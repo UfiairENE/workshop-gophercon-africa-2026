@@ -20,7 +20,7 @@ var (
 	pegasi = body.CreateParams{
 		Key: "exo:51 Peg b", Name: "51 Peg b", Kind: body.KindExoplanet, System: "51 Peg", Parent: "51 Peg",
 		Discovery: body.Discovery{Year: ptr(1995), By: "Haute-Provence Observatory", Method: "Radial Velocity"},
-		Sky:       body.Sky{RightAscension: ptr(344.37), Declination: ptr(20.77), DistanceParsecs: ptr(15.46)},
+		Sky:       body.Sky{RightAscension: ptr(344.37), Declination: ptr(20.77), DistanceParsecs: ptr(15.46), ApparentMagnitude: ptr(5.45)},
 	}
 )
 
@@ -31,14 +31,26 @@ func TestStore(t *testing.T) {
 	t.Cleanup(cleanup)
 	store := bodysqlite.New(conn)
 
-	added, err := store.CreateMany(ctx, []body.CreateParams{pegasi, earth})
+	added, err := store.SaveMany(ctx, []body.CreateParams{pegasi, earth})
 	require.NoError(t, err)
 	assert.Equal(t, 2, added)
 
-	t.Run("Seeding again adds nothing", func(t *testing.T) {
-		added, err := store.CreateMany(ctx, []body.CreateParams{earth})
+	t.Run("Seeding again refreshes rather than adds", func(t *testing.T) {
+		before, err := store.FindByName(ctx, "Earth")
+		require.NoError(t, err)
+
+		bigger := earth
+		bigger.Physical.RadiusEarth = ptr(1.01)
+		bigger.CatalogueNames = []string{"Terra", "Gaia"}
+		added, err := store.SaveMany(ctx, []body.CreateParams{bigger})
 		require.NoError(t, err)
 		assert.Equal(t, 0, added)
+
+		after, err := store.FindByName(ctx, "Earth")
+		require.NoError(t, err)
+		assert.Equal(t, before.ID, after.ID)
+		assert.InDelta(t, 1.01, *after.Physical.RadiusEarth, 1e-9)
+		assert.Equal(t, []string{"Terra", "Gaia"}, after.CatalogueNames)
 	})
 
 	t.Run("List puts the Solar System first", func(t *testing.T) {
@@ -49,6 +61,7 @@ func TestStore(t *testing.T) {
 		assert.Equal(t, "51 Peg b", got[1].Name)
 		assert.Equal(t, 1995, *got[1].Discovery.Year)
 		assert.InDelta(t, 15.46, *got[1].Sky.DistanceParsecs, 1e-9)
+		assert.InDelta(t, 5.45, *got[1].Sky.ApparentMagnitude, 1e-9)
 	})
 
 	t.Run("List by kind", func(t *testing.T) {

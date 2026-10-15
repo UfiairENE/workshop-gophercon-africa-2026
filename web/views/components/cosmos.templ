@@ -23,7 +23,7 @@ templ PortraitGrid(portraits []Portrait) {
 						data-kind={ string(p.Body.Kind) }
 						aria-hidden="true"
 					></div>
-					<h3 class="portrait__name">{ p.Body.Name }</h3>
+					<h3 class="portrait__name"><a class="portrait__link" href={ templ.URL(WorldURL(p.Body.Name)) }>{ p.Body.Name }</a></h3>
 					<p class="portrait__meta">
 						if p.Body.InSolarSystem() {
 							{ p.Body.Kind.String() } · { found(p.Body) }
@@ -46,8 +46,9 @@ templ StarMapPanel(bodies []body.Body) {
 	<figure class="starmap">
 		<div class="starmap__panel">
 			@templ.JSONScript("starmap-data", systems)
-			@ThreeScene(ThreeSceneProps{Scene: "starmap", Label: starMapLabel(len(systems))})
-			<p class="starmap__hint" aria-hidden="true">Drag to turn</p>
+			@ThreeScene(ThreeSceneProps{Scene: "starmap", Label: starMapLabel(len(systems.Points))})
+			<p class="starmap__hint" aria-hidden="true">Drag to turn · click a star</p>
+			<p class="starmap__tip" aria-hidden="true" hidden></p>
 		</div>
 		<figcaption class="legend">
 			<span class="legend__key"><i class="legend__dot starmap__dot--hot" aria-hidden="true"></i>Hot blue-white stars</span>
@@ -78,7 +79,7 @@ templ NearestTable(bodies []body.Body) {
 						{{ colour, _ := heat(b.Physical.EquilibriumTempK) }}
 						<span class="legend__dot" style={ map[string]string{"color": colour} } aria-hidden="true"></span>
 						<span>
-							<b>{ b.Name }</b>
+							<a class="catalogue__link" href={ templ.URL(WorldURL(b.Name)) }><b>{ b.Name }</b></a>
 							<small>Orbits { b.Parent }</small>
 						</span>
 					</td>

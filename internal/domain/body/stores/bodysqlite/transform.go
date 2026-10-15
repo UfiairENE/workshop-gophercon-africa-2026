@@ -1,6 +1,7 @@
 package bodysqlite
 
 import (
+	"strings"
 	"uuid"
 	"workshop/internal/domain/body"
 	"workshop/internal/infra/db/sqlc"
@@ -15,6 +16,8 @@ func transform(r db.Body) body.Body {
 		System:          r.System,
 		Parent:          r.Parent,
 		PlanetsInSystem: r.PlanetsInSystem,
+		StarsInSystem:   r.StarsInSystem,
+		CatalogueNames:  splitNames(r.CatalogueNames),
 		Discovery: body.Discovery{
 			Year:   r.DiscoveredYear,
 			By:     r.DiscoveredBy,
@@ -30,22 +33,36 @@ func transform(r db.Body) body.Body {
 			SemiMajorAxisAU: r.SemiMajorAxisAu,
 		},
 		Star: body.Star{
-			SpectralType: r.StarSpectralType,
-			TempK:        r.StarTempK,
-			RadiusSun:    r.StarRadiusSun,
+			SpectralType:  r.StarSpectralType,
+			TempK:         r.StarTempK,
+			RadiusSun:     r.StarRadiusSun,
+			MassSun:       r.StarMassSun,
+			AgeGyr:        r.StarAgeGyr,
+			LuminosityLog: r.StarLuminosityLog,
 		},
 		Sky: body.Sky{
-			RightAscension:  r.RightAscensionDeg,
-			Declination:     r.DeclinationDeg,
-			DistanceParsecs: r.DistanceParsecs,
+			RightAscension:    r.RightAscensionDeg,
+			Declination:       r.DeclinationDeg,
+			DistanceParsecs:   r.DistanceParsecs,
+			ApparentMagnitude: r.ApparentMagnitude,
 		},
 		CreatedAt: r.CreatedAt,
 		UpdatedAt: r.UpdatedAt,
 	}
 }
 
-func toCreateParams(id uuid.UUID, in body.CreateParams) db.BodyCreateParams {
-	return db.BodyCreateParams{
+// The catalogue names column holds a body's other names joined by this.
+const nameSep = "; "
+
+func splitNames(s string) []string {
+	if s == "" {
+		return nil
+	}
+	return strings.Split(s, nameSep)
+}
+
+func toUpsertParams(id uuid.UUID, in body.CreateParams) db.BodyUpsertParams {
+	return db.BodyUpsertParams{
 		ID:                id,
 		CatalogueKey:      in.Key,
 		Name:              in.Name,
@@ -67,5 +84,11 @@ func toCreateParams(id uuid.UUID, in body.CreateParams) db.BodyCreateParams {
 		RightAscensionDeg: in.Sky.RightAscension,
 		DeclinationDeg:    in.Sky.Declination,
 		DistanceParsecs:   in.Sky.DistanceParsecs,
+		StarsInSystem:     in.StarsInSystem,
+		ApparentMagnitude: in.Sky.ApparentMagnitude,
+		StarLuminosityLog: in.Star.LuminosityLog,
+		StarMassSun:       in.Star.MassSun,
+		StarAgeGyr:        in.Star.AgeGyr,
+		CatalogueNames:    strings.Join(in.CatalogueNames, nameSep),
 	}
 }

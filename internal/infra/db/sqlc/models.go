@@ -34,6 +34,12 @@ type Body struct {
 	RightAscensionDeg *float64  `db:"right_ascension_deg" json:"right_ascension_deg"`
 	DeclinationDeg    *float64  `db:"declination_deg" json:"declination_deg"`
 	DistanceParsecs   *float64  `db:"distance_parsecs" json:"distance_parsecs"`
+	StarsInSystem     *int      `db:"stars_in_system" json:"stars_in_system"`
+	ApparentMagnitude *float64  `db:"apparent_magnitude" json:"apparent_magnitude"`
+	StarLuminosityLog *float64  `db:"star_luminosity_log" json:"star_luminosity_log"`
+	StarMassSun       *float64  `db:"star_mass_sun" json:"star_mass_sun"`
+	StarAgeGyr        *float64  `db:"star_age_gyr" json:"star_age_gyr"`
+	CatalogueNames    string    `db:"catalogue_names" json:"catalogue_names"`
 }
 
 type Sighting struct {

@@ -23,7 +23,8 @@ const BaseURL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 // query is the ADQL behind both the snapshot and a live fetch: one row per
 // planet from the archive's composite parameters table.
 const query = "select pl_name,hostname,sy_pnum,discoverymethod,disc_year,disc_facility," +
-	"pl_orbper,pl_orbsmax,pl_rade,pl_bmasse,pl_eqt,st_spectype,st_teff,st_rad,ra,dec,sy_dist " +
+	"pl_orbper,pl_orbsmax,pl_rade,pl_bmasse,pl_eqt,st_spectype,st_teff,st_rad,ra,dec,sy_dist," +
+	"sy_snum,sy_vmag,st_lum,st_mass,st_age,hd_name,hip_name " +
 	"from pscomppars order by disc_year,pl_name"
 
 // snapshot is the archive's answer to query, saved so seeding needs no network.
@@ -51,6 +52,17 @@ type Planet struct {
 	RightAscension    *float64
 	Declination       *float64
 	DistanceParsecs   *float64
+	StarsInSystem     *int
+	// ApparentMagnitude is how bright the system looks from Earth in
+	// visible light: lower is brighter, and 6 is about the faintest an
+	// eye can see.
+	ApparentMagnitude *float64
+	// StarLuminosityLog is the star's output as log10 of the Sun's.
+	StarLuminosityLog *float64
+	StarMassSun       *float64
+	StarAgeGyr        *float64
+	HDName            string
+	HIPName           string
 }
 
 // Client fetches planets from the archive.
@@ -93,7 +105,8 @@ func (c *Client) Fetch(ctx context.Context) ([]Planet, error) {
 var columns = []string{
 	"pl_name", "hostname", "sy_pnum", "discoverymethod", "disc_year", "disc_facility",
 	"pl_orbper", "pl_orbsmax", "pl_rade", "pl_bmasse", "pl_eqt", "st_spectype", "st_teff",
-	"st_rad", "ra", "dec", "sy_dist",
+	"st_rad", "ra", "dec", "sy_dist", "sy_snum", "sy_vmag", "st_lum", "st_mass", "st_age", "hd_name",
+	"hip_name",
 }
 
 func parse(r io.Reader) ([]Planet, error) {
@@ -125,6 +138,8 @@ func parse(r io.Reader) ([]Planet, error) {
 			DiscoveryMethod:   rec[3],
 			DiscoveryFacility: rec[5],
 			StarSpectralType:  rec[11],
+			HDName:            rec[22],
+			HIPName:           rec[23],
 		}
 		var errs []error
 		p.PlanetsInSystem = integer(rec[2], &errs)
@@ -139,6 +154,11 @@ func parse(r io.Reader) ([]Planet, error) {
 		p.RightAscension = number(rec[14], &errs)
 		p.Declination = number(rec[15], &errs)
 		p.DistanceParsecs = number(rec[16], &errs)
+		p.StarsInSystem = integer(rec[17], &errs)
+		p.ApparentMagnitude = number(rec[18], &errs)
+		p.StarLuminosityLog = number(rec[19], &errs)
+		p.StarMassSun = number(rec[20], &errs)
+		p.StarAgeGyr = number(rec[21], &errs)
 		if err := errors.Join(errs...); err != nil {
 			return nil, fmt.Errorf("exoplanets: line %d: %w", line, err)
 		}

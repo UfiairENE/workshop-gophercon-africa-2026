@@ -1,0 +1,79 @@
+package components
+
+import "workshop/internal/domain/body"
+
+templ WorldArt(p Portrait, label string) {
+	<div
+		class="world-art"
+		data-colour={ p.Colour }
+		data-accent={ p.Accent }
+		data-bands={ num(p.Bands) }
+		data-ring?={ p.Ring }
+		data-star?={ p.Body.Kind == body.KindStar }
+	>
+		@ThreeScene(ThreeSceneProps{Scene: "world", Label: label})
+	</div>
+}
+
+templ Facts(facts []Fact) {
+	if len(facts) > 0 {
+		<dl class="facts">
+			for _, f := range facts {
+				<div class="facts__item">
+					<dt>{ f.Label }</dt>
+					<dd>{ f.Value }</dd>
+					if f.Note != "" {
+						<p class="facts__note">{ f.Note }</p>
+					}
+				</div>
+			}
+		</dl>
+	}
+}
+
+templ BodyLinks(bodies []body.Body) {
+	<ul class="links">
+		for _, b := range bodies {
+			{{ look := LookOf(b) }}
+			<li>
+				<a class="links__item" href={ templ.URL(WorldURL(b.Name)) }>
+					<span class="links__dot" style={ map[string]string{"color": look.Colour} } aria-hidden="true"></span>
+					<span class="links__name">{ DisplayName(b) }</span>
+					<span class="links__meta">
+						if r := b.Physical.RadiusEarth; r != nil && b.Kind != body.KindStar {
+							{ times(r) } Earth
+						} else {
+							{ b.Kind.String() }
+						}
+					</span>
+				</a>
+			</li>
+		}
+	</ul>
+}
+
+templ StarCards(stars []body.Body) {
+	<ul class="star-cards">
+		for _, s := range stars {
+			{{ names := body.StarNames(s.Name) }}
+			{{ colour, _ := starColour(s.Star.TempK) }}
+			<li class="star-card">
+				<span class="star-card__glow" style={ map[string]string{"color": colour} } aria-hidden="true"></span>
+				<h3 class="star-card__name">
+					<a href={ templ.URL(WorldURL(s.Name)) }>{ DisplayName(s) }</a>
+				</h3>
+				<p class="star-card__meta">
+					if names.Constellation != "" {
+						In { names.Constellation } ·
+					}
+					{ body.TypeOf(s.Name, s.Star).Class }
+				</p>
+				<dl class="star-card__facts">
+					<div><dt>Magnitude</dt><dd>{ magnitude(s) }</dd></div>
+					<div><dt>Best seen</dt><dd>{ bestMonth(s) }</dd></div>
+					<div><dt>Planets</dt><dd>{ planetCount(s) }</dd></div>
+				</dl>
+			</li>
+		}
+	</ul>
+}

@@ -17,7 +17,11 @@ ORDER BY system = 'Solar System' DESC,
 	discovered_year IS NULL DESC, discovered_year, name
 LIMIT sqlc.arg('limit');
 
--- name: BodyCreate :execrows
+-- name: BodyCount :one
+SELECT COUNT(*) FROM bodies;
+
+-- name: BodyUpsert :exec
+-- Seeding again refreshes what the catalogue says, keeping each body's ID.
 INSERT INTO bodies (
 	id,
 	catalogue_key,
@@ -39,6 +43,38 @@ INSERT INTO bodies (
 	star_radius_sun,
 	right_ascension_deg,
 	declination_deg,
-	distance_parsecs
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-ON CONFLICT (catalogue_key) DO NOTHING;
+	distance_parsecs,
+	stars_in_system,
+	apparent_magnitude,
+	star_luminosity_log,
+	star_mass_sun,
+	star_age_gyr,
+	catalogue_names
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT (catalogue_key) DO UPDATE SET
+	name = excluded.name,
+	kind = excluded.kind,
+	system = excluded.system,
+	parent = excluded.parent,
+	planets_in_system = excluded.planets_in_system,
+	discovered_year = excluded.discovered_year,
+	discovered_by = excluded.discovered_by,
+	discovery_method = excluded.discovery_method,
+	radius_earth = excluded.radius_earth,
+	mass_earth = excluded.mass_earth,
+	orbital_period_days = excluded.orbital_period_days,
+	semi_major_axis_au = excluded.semi_major_axis_au,
+	equilibrium_temp_k = excluded.equilibrium_temp_k,
+	star_spectral_type = excluded.star_spectral_type,
+	star_temp_k = excluded.star_temp_k,
+	star_radius_sun = excluded.star_radius_sun,
+	right_ascension_deg = excluded.right_ascension_deg,
+	declination_deg = excluded.declination_deg,
+	distance_parsecs = excluded.distance_parsecs,
+	stars_in_system = excluded.stars_in_system,
+	apparent_magnitude = excluded.apparent_magnitude,
+	star_luminosity_log = excluded.star_luminosity_log,
+	star_mass_sun = excluded.star_mass_sun,
+	star_age_gyr = excluded.star_age_gyr,
+	catalogue_names = excluded.catalogue_names,
+	updated_at = CURRENT_TIMESTAMP;

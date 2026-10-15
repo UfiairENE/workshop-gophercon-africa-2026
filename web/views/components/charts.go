@@ -66,7 +66,6 @@ func bar(count, longest int) map[string]string {
 	return map[string]string{"--bar": strconv.Itoa(count*100/longest) + "%"}
 }
 
-
 // BusiestYear is the year with the most discoveries.
 func BusiestYear(byYear map[int]int) int {
 	y, _ := peak(byYear)

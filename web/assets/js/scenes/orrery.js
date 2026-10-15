@@ -56,6 +56,28 @@ mount('orrery', function ({ THREE, scene, camera, canvas, pointer, colour }) {
 		return { mesh, r, rate: (Math.PI * 2 * 365.256) / (b.period * SECONDS_PER_YEAR), phase: i * 2.17 };
 	});
 
+	// Clicking a planet opens its page.
+	const raycaster = new THREE.Raycaster();
+	const mouse = new THREE.Vector2();
+	const meshes = planets.map((p) => p.mesh);
+
+	function pick(e) {
+		const rect = canvas.getBoundingClientRect();
+		mouse.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+		raycaster.setFromCamera(mouse, camera);
+		const hit = raycaster.intersectObjects([sun, ...meshes], false)[0];
+		if (!hit) return null;
+		return hit.object === sun ? 'Sun' : data[meshes.indexOf(hit.object)].name;
+	}
+
+	canvas.addEventListener('pointermove', function (e) {
+		canvas.style.cursor = pick(e) ? 'pointer' : '';
+	});
+	canvas.addEventListener('click', function (e) {
+		const name = pick(e);
+		if (name) window.location.href = '/worlds/' + encodeURIComponent(name);
+	});
+
 	let tilt = 1.05;
 	let distance = 15;
 

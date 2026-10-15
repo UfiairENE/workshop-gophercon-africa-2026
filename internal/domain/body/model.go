@@ -63,15 +63,19 @@ type (
 		Kind   Kind   `json:"kind"`
 		System string `json:"system"`
 		// Parent is what the body orbits: a star for planets, a planet for moons.
-		Parent          string    `json:"parent,omitzero"`
-		PlanetsInSystem *int      `json:"planetsInSystem,omitzero"`
-		Discovery       Discovery `json:"discovery"`
-		Physical        Physical  `json:"physical"`
-		Orbit           Orbit     `json:"orbit"`
-		Star            Star      `json:"star"`
-		Sky             Sky       `json:"sky"`
-		CreatedAt       time.Time `json:"createdAt"`
-		UpdatedAt       time.Time `json:"updatedAt"`
+		Parent          string `json:"parent,omitzero"`
+		PlanetsInSystem *int   `json:"planetsInSystem,omitzero"`
+		StarsInSystem   *int   `json:"starsInSystem,omitzero"`
+		// CatalogueNames are other names astronomers file it under, such
+		// as "HD 217014".
+		CatalogueNames []string  `json:"catalogueNames,omitzero"`
+		Discovery      Discovery `json:"discovery"`
+		Physical       Physical  `json:"physical"`
+		Orbit          Orbit     `json:"orbit"`
+		Star           Star      `json:"star"`
+		Sky            Sky       `json:"sky"`
+		CreatedAt      time.Time `json:"createdAt"`
+		UpdatedAt      time.Time `json:"updatedAt"`
 	}
 	// Discovery is who found a body, when and how. A zero Year means it
 	// has been known since antiquity.
@@ -97,6 +101,11 @@ type (
 		SpectralType string   `json:"spectralType,omitzero"`
 		TempK        *float64 `json:"tempK,omitzero"`
 		RadiusSun    *float64 `json:"radiusSun,omitzero"`
+		MassSun      *float64 `json:"massSun,omitzero"`
+		AgeGyr       *float64 `json:"ageGyr,omitzero"`
+		// LuminosityLog is the star's total output as log10 of the Sun's,
+		// so 0 shines like the Sun and -1 a tenth as bright.
+		LuminosityLog *float64 `json:"luminosityLog,omitzero"`
 	}
 	// Sky is where a body's system appears from Earth: right ascension
 	// and declination in degrees, and its distance in parsecs.
@@ -104,6 +113,9 @@ type (
 		RightAscension  *float64 `json:"rightAscension,omitzero"`
 		Declination     *float64 `json:"declination,omitzero"`
 		DistanceParsecs *float64 `json:"distanceParsecs,omitzero"`
+		// ApparentMagnitude is how bright the system looks from Earth:
+		// lower is brighter, and about 6 is the faintest an eye can see.
+		ApparentMagnitude *float64 `json:"apparentMagnitude,omitzero"`
 	}
 	// CreateParams is a body without its ID or timestamps.
 	CreateParams struct {
@@ -113,6 +125,8 @@ type (
 		System          string    `json:"system"`
 		Parent          string    `json:"parent,omitzero"`
 		PlanetsInSystem *int      `json:"planetsInSystem,omitzero"`
+		StarsInSystem   *int      `json:"starsInSystem,omitzero"`
+		CatalogueNames  []string  `json:"catalogueNames,omitzero"`
 		Discovery       Discovery `json:"discovery"`
 		Physical        Physical  `json:"physical"`
 		Orbit           Orbit     `json:"orbit"`

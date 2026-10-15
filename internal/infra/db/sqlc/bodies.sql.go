@@ -11,89 +11,19 @@ import (
 	"uuid"
 )
 
-const bodyCreate = `-- name: BodyCreate :execrows
-INSERT INTO bodies (
-	id,
-	catalogue_key,
-	name,
-	kind,
-	system,
-	parent,
-	planets_in_system,
-	discovered_year,
-	discovered_by,
-	discovery_method,
-	radius_earth,
-	mass_earth,
-	orbital_period_days,
-	semi_major_axis_au,
-	equilibrium_temp_k,
-	star_spectral_type,
-	star_temp_k,
-	star_radius_sun,
-	right_ascension_deg,
-	declination_deg,
-	distance_parsecs
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-ON CONFLICT (catalogue_key) DO NOTHING
+const bodyCount = `-- name: BodyCount :one
+SELECT COUNT(*) FROM bodies
 `
 
-type BodyCreateParams struct {
-	ID                uuid.UUID `db:"id" json:"id"`
-	CatalogueKey      string    `db:"catalogue_key" json:"catalogue_key"`
-	Name              string    `db:"name" json:"name"`
-	Kind              string    `db:"kind" json:"kind"`
-	System            string    `db:"system" json:"system"`
-	Parent            string    `db:"parent" json:"parent"`
-	PlanetsInSystem   *int      `db:"planets_in_system" json:"planets_in_system"`
-	DiscoveredYear    *int      `db:"discovered_year" json:"discovered_year"`
-	DiscoveredBy      string    `db:"discovered_by" json:"discovered_by"`
-	DiscoveryMethod   string    `db:"discovery_method" json:"discovery_method"`
-	RadiusEarth       *float64  `db:"radius_earth" json:"radius_earth"`
-	MassEarth         *float64  `db:"mass_earth" json:"mass_earth"`
-	OrbitalPeriodDays *float64  `db:"orbital_period_days" json:"orbital_period_days"`
-	SemiMajorAxisAu   *float64  `db:"semi_major_axis_au" json:"semi_major_axis_au"`
-	EquilibriumTempK  *float64  `db:"equilibrium_temp_k" json:"equilibrium_temp_k"`
-	StarSpectralType  string    `db:"star_spectral_type" json:"star_spectral_type"`
-	StarTempK         *float64  `db:"star_temp_k" json:"star_temp_k"`
-	StarRadiusSun     *float64  `db:"star_radius_sun" json:"star_radius_sun"`
-	RightAscensionDeg *float64  `db:"right_ascension_deg" json:"right_ascension_deg"`
-	DeclinationDeg    *float64  `db:"declination_deg" json:"declination_deg"`
-	DistanceParsecs   *float64  `db:"distance_parsecs" json:"distance_parsecs"`
-}
-
-func (q *Queries) BodyCreate(ctx context.Context, arg BodyCreateParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, bodyCreate,
-		arg.ID,
-		arg.CatalogueKey,
-		arg.Name,
-		arg.Kind,
-		arg.System,
-		arg.Parent,
-		arg.PlanetsInSystem,
-		arg.DiscoveredYear,
-		arg.DiscoveredBy,
-		arg.DiscoveryMethod,
-		arg.RadiusEarth,
-		arg.MassEarth,
-		arg.OrbitalPeriodDays,
-		arg.SemiMajorAxisAu,
-		arg.EquilibriumTempK,
-		arg.StarSpectralType,
-		arg.StarTempK,
-		arg.StarRadiusSun,
-		arg.RightAscensionDeg,
-		arg.DeclinationDeg,
-		arg.DistanceParsecs,
-	)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
+func (q *Queries) BodyCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, bodyCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const bodyFind = `-- name: BodyFind :one
-SELECT id, created_at, updated_at, catalogue_key, name, kind, system, parent, planets_in_system, discovered_year, discovered_by, discovery_method, radius_earth, mass_earth, orbital_period_days, semi_major_axis_au, equilibrium_temp_k, star_spectral_type, star_temp_k, star_radius_sun, right_ascension_deg, declination_deg, distance_parsecs FROM bodies WHERE id = ?
+SELECT id, created_at, updated_at, catalogue_key, name, kind, system, parent, planets_in_system, discovered_year, discovered_by, discovery_method, radius_earth, mass_earth, orbital_period_days, semi_major_axis_au, equilibrium_temp_k, star_spectral_type, star_temp_k, star_radius_sun, right_ascension_deg, declination_deg, distance_parsecs, stars_in_system, apparent_magnitude, star_luminosity_log, star_mass_sun, star_age_gyr, catalogue_names FROM bodies WHERE id = ?
 `
 
 func (q *Queries) BodyFind(ctx context.Context, id uuid.UUID) (Body, error) {
@@ -123,12 +53,18 @@ func (q *Queries) BodyFind(ctx context.Context, id uuid.UUID) (Body, error) {
 		&i.RightAscensionDeg,
 		&i.DeclinationDeg,
 		&i.DistanceParsecs,
+		&i.StarsInSystem,
+		&i.ApparentMagnitude,
+		&i.StarLuminosityLog,
+		&i.StarMassSun,
+		&i.StarAgeGyr,
+		&i.CatalogueNames,
 	)
 	return i, err
 }
 
 const bodyFindByKey = `-- name: BodyFindByKey :one
-SELECT id, created_at, updated_at, catalogue_key, name, kind, system, parent, planets_in_system, discovered_year, discovered_by, discovery_method, radius_earth, mass_earth, orbital_period_days, semi_major_axis_au, equilibrium_temp_k, star_spectral_type, star_temp_k, star_radius_sun, right_ascension_deg, declination_deg, distance_parsecs FROM bodies WHERE catalogue_key = ?
+SELECT id, created_at, updated_at, catalogue_key, name, kind, system, parent, planets_in_system, discovered_year, discovered_by, discovery_method, radius_earth, mass_earth, orbital_period_days, semi_major_axis_au, equilibrium_temp_k, star_spectral_type, star_temp_k, star_radius_sun, right_ascension_deg, declination_deg, distance_parsecs, stars_in_system, apparent_magnitude, star_luminosity_log, star_mass_sun, star_age_gyr, catalogue_names FROM bodies WHERE catalogue_key = ?
 `
 
 func (q *Queries) BodyFindByKey(ctx context.Context, catalogueKey string) (Body, error) {
@@ -158,12 +94,18 @@ func (q *Queries) BodyFindByKey(ctx context.Context, catalogueKey string) (Body,
 		&i.RightAscensionDeg,
 		&i.DeclinationDeg,
 		&i.DistanceParsecs,
+		&i.StarsInSystem,
+		&i.ApparentMagnitude,
+		&i.StarLuminosityLog,
+		&i.StarMassSun,
+		&i.StarAgeGyr,
+		&i.CatalogueNames,
 	)
 	return i, err
 }
 
 const bodyFindByName = `-- name: BodyFindByName :one
-SELECT id, created_at, updated_at, catalogue_key, name, kind, system, parent, planets_in_system, discovered_year, discovered_by, discovery_method, radius_earth, mass_earth, orbital_period_days, semi_major_axis_au, equilibrium_temp_k, star_spectral_type, star_temp_k, star_radius_sun, right_ascension_deg, declination_deg, distance_parsecs FROM bodies WHERE name = ? COLLATE NOCASE LIMIT 1
+SELECT id, created_at, updated_at, catalogue_key, name, kind, system, parent, planets_in_system, discovered_year, discovered_by, discovery_method, radius_earth, mass_earth, orbital_period_days, semi_major_axis_au, equilibrium_temp_k, star_spectral_type, star_temp_k, star_radius_sun, right_ascension_deg, declination_deg, distance_parsecs, stars_in_system, apparent_magnitude, star_luminosity_log, star_mass_sun, star_age_gyr, catalogue_names FROM bodies WHERE name = ? COLLATE NOCASE LIMIT 1
 `
 
 func (q *Queries) BodyFindByName(ctx context.Context, name string) (Body, error) {
@@ -193,12 +135,18 @@ func (q *Queries) BodyFindByName(ctx context.Context, name string) (Body, error)
 		&i.RightAscensionDeg,
 		&i.DeclinationDeg,
 		&i.DistanceParsecs,
+		&i.StarsInSystem,
+		&i.ApparentMagnitude,
+		&i.StarLuminosityLog,
+		&i.StarMassSun,
+		&i.StarAgeGyr,
+		&i.CatalogueNames,
 	)
 	return i, err
 }
 
 const bodyList = `-- name: BodyList :many
-SELECT id, created_at, updated_at, catalogue_key, name, kind, system, parent, planets_in_system, discovered_year, discovered_by, discovery_method, radius_earth, mass_earth, orbital_period_days, semi_major_axis_au, equilibrium_temp_k, star_spectral_type, star_temp_k, star_radius_sun, right_ascension_deg, declination_deg, distance_parsecs FROM bodies
+SELECT id, created_at, updated_at, catalogue_key, name, kind, system, parent, planets_in_system, discovered_year, discovered_by, discovery_method, radius_earth, mass_earth, orbital_period_days, semi_major_axis_au, equilibrium_temp_k, star_spectral_type, star_temp_k, star_radius_sun, right_ascension_deg, declination_deg, distance_parsecs, stars_in_system, apparent_magnitude, star_luminosity_log, star_mass_sun, star_age_gyr, catalogue_names FROM bodies
 WHERE (CAST(?1 AS BOOLEAN) OR kind IN (SELECT value FROM json_each(CAST(?2 AS TEXT))))
 	AND (CAST(?3 AS TEXT) = '' OR system = CAST(?3 AS TEXT) COLLATE NOCASE)
 ORDER BY system = 'Solar System' DESC,
@@ -253,6 +201,12 @@ func (q *Queries) BodyList(ctx context.Context, arg BodyListParams) ([]Body, err
 			&i.RightAscensionDeg,
 			&i.DeclinationDeg,
 			&i.DistanceParsecs,
+			&i.StarsInSystem,
+			&i.ApparentMagnitude,
+			&i.StarLuminosityLog,
+			&i.StarMassSun,
+			&i.StarAgeGyr,
+			&i.CatalogueNames,
 		); err != nil {
 			return nil, err
 		}
@@ -265,4 +219,127 @@ func (q *Queries) BodyList(ctx context.Context, arg BodyListParams) ([]Body, err
 		return nil, err
 	}
 	return items, nil
+}
+
+const bodyUpsert = `-- name: BodyUpsert :exec
+INSERT INTO bodies (
+	id,
+	catalogue_key,
+	name,
+	kind,
+	system,
+	parent,
+	planets_in_system,
+	discovered_year,
+	discovered_by,
+	discovery_method,
+	radius_earth,
+	mass_earth,
+	orbital_period_days,
+	semi_major_axis_au,
+	equilibrium_temp_k,
+	star_spectral_type,
+	star_temp_k,
+	star_radius_sun,
+	right_ascension_deg,
+	declination_deg,
+	distance_parsecs,
+	stars_in_system,
+	apparent_magnitude,
+	star_luminosity_log,
+	star_mass_sun,
+	star_age_gyr,
+	catalogue_names
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT (catalogue_key) DO UPDATE SET
+	name = excluded.name,
+	kind = excluded.kind,
+	system = excluded.system,
+	parent = excluded.parent,
+	planets_in_system = excluded.planets_in_system,
+	discovered_year = excluded.discovered_year,
+	discovered_by = excluded.discovered_by,
+	discovery_method = excluded.discovery_method,
+	radius_earth = excluded.radius_earth,
+	mass_earth = excluded.mass_earth,
+	orbital_period_days = excluded.orbital_period_days,
+	semi_major_axis_au = excluded.semi_major_axis_au,
+	equilibrium_temp_k = excluded.equilibrium_temp_k,
+	star_spectral_type = excluded.star_spectral_type,
+	star_temp_k = excluded.star_temp_k,
+	star_radius_sun = excluded.star_radius_sun,
+	right_ascension_deg = excluded.right_ascension_deg,
+	declination_deg = excluded.declination_deg,
+	distance_parsecs = excluded.distance_parsecs,
+	stars_in_system = excluded.stars_in_system,
+	apparent_magnitude = excluded.apparent_magnitude,
+	star_luminosity_log = excluded.star_luminosity_log,
+	star_mass_sun = excluded.star_mass_sun,
+	star_age_gyr = excluded.star_age_gyr,
+	catalogue_names = excluded.catalogue_names,
+	updated_at = CURRENT_TIMESTAMP
+`
+
+type BodyUpsertParams struct {
+	ID                uuid.UUID `db:"id" json:"id"`
+	CatalogueKey      string    `db:"catalogue_key" json:"catalogue_key"`
+	Name              string    `db:"name" json:"name"`
+	Kind              string    `db:"kind" json:"kind"`
+	System            string    `db:"system" json:"system"`
+	Parent            string    `db:"parent" json:"parent"`
+	PlanetsInSystem   *int      `db:"planets_in_system" json:"planets_in_system"`
+	DiscoveredYear    *int      `db:"discovered_year" json:"discovered_year"`
+	DiscoveredBy      string    `db:"discovered_by" json:"discovered_by"`
+	DiscoveryMethod   string    `db:"discovery_method" json:"discovery_method"`
+	RadiusEarth       *float64  `db:"radius_earth" json:"radius_earth"`
+	MassEarth         *float64  `db:"mass_earth" json:"mass_earth"`
+	OrbitalPeriodDays *float64  `db:"orbital_period_days" json:"orbital_period_days"`
+	SemiMajorAxisAu   *float64  `db:"semi_major_axis_au" json:"semi_major_axis_au"`
+	EquilibriumTempK  *float64  `db:"equilibrium_temp_k" json:"equilibrium_temp_k"`
+	StarSpectralType  string    `db:"star_spectral_type" json:"star_spectral_type"`
+	StarTempK         *float64  `db:"star_temp_k" json:"star_temp_k"`
+	StarRadiusSun     *float64  `db:"star_radius_sun" json:"star_radius_sun"`
+	RightAscensionDeg *float64  `db:"right_ascension_deg" json:"right_ascension_deg"`
+	DeclinationDeg    *float64  `db:"declination_deg" json:"declination_deg"`
+	DistanceParsecs   *float64  `db:"distance_parsecs" json:"distance_parsecs"`
+	StarsInSystem     *int      `db:"stars_in_system" json:"stars_in_system"`
+	ApparentMagnitude *float64  `db:"apparent_magnitude" json:"apparent_magnitude"`
+	StarLuminosityLog *float64  `db:"star_luminosity_log" json:"star_luminosity_log"`
+	StarMassSun       *float64  `db:"star_mass_sun" json:"star_mass_sun"`
+	StarAgeGyr        *float64  `db:"star_age_gyr" json:"star_age_gyr"`
+	CatalogueNames    string    `db:"catalogue_names" json:"catalogue_names"`
+}
+
+// Seeding again refreshes what the catalogue says, keeping each body's ID.
+func (q *Queries) BodyUpsert(ctx context.Context, arg BodyUpsertParams) error {
+	_, err := q.db.ExecContext(ctx, bodyUpsert,
+		arg.ID,
+		arg.CatalogueKey,
+		arg.Name,
+		arg.Kind,
+		arg.System,
+		arg.Parent,
+		arg.PlanetsInSystem,
+		arg.DiscoveredYear,
+		arg.DiscoveredBy,
+		arg.DiscoveryMethod,
+		arg.RadiusEarth,
+		arg.MassEarth,
+		arg.OrbitalPeriodDays,
+		arg.SemiMajorAxisAu,
+		arg.EquilibriumTempK,
+		arg.StarSpectralType,
+		arg.StarTempK,
+		arg.StarRadiusSun,
+		arg.RightAscensionDeg,
+		arg.DeclinationDeg,
+		arg.DistanceParsecs,
+		arg.StarsInSystem,
+		arg.ApparentMagnitude,
+		arg.StarLuminosityLog,
+		arg.StarMassSun,
+		arg.StarAgeGyr,
+		arg.CatalogueNames,
+	)
+	return err
 }

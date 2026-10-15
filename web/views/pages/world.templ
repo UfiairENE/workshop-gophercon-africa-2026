@@ -1,0 +1,129 @@
+package pages
+
+import (
+	"workshop/internal/domain/body"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ World(b body.Body, host body.Body, family []body.Body) {
+	@layout.Base(layout.BaseProps{
+		Title:       components.DisplayName(b) + " · Earthbound Observatory",
+		Description: worldDescription(b, host),
+	}) {
+		if b.Kind == body.KindStar {
+			@starPage(b, family)
+		} else {
+			@planetPage(b, host, family)
+		}
+	}
+}
+
+templ worldHero(b body.Body, eyebrow string) {
+	<section class="world-hero">
+		<div class="wrap world-hero__inner">
+			<div class="world-hero__copy">
+				<p class="eyebrow"><a href="/#worlds">Worlds</a> / { eyebrow }</p>
+				<h1 class="world-hero__title">{ components.DisplayName(b) }</h1>
+				{ children... }
+			</div>
+			@components.WorldArt(components.LookOf(b), artLabel(b))
+		</div>
+	</section>
+}
+
+templ planetPage(b body.Body, host body.Body, family []body.Body) {
+	@worldHero(b, b.Kind.String()) {
+		<p class="world-hero__lede">{ planetLede(b, host) }</p>
+	}
+	<section class="section reveal" aria-labelledby="glance-title">
+		<div class="wrap">
+			<header class="section__head">
+				<h2 class="section__title" id="glance-title">At a glance</h2>
+				<p class="section__lede">Measured against Earth. A dash means nobody has measured it yet: for most planets beyond the Sun, only a few figures are known.</p>
+			</header>
+			@components.Facts(components.PlanetFacts(b))
+		</div>
+	</section>
+	<section class="section reveal" aria-labelledby="found-title">
+		<div class="wrap">
+			<header class="section__head">
+				<h2 class="section__title" id="found-title">How we know</h2>
+			</header>
+			<div class="story">
+				if b.Discovery.Year == nil {
+					<p class="story__big">Known since antiquity.</p>
+					<p>Bright enough to see without a telescope, it was watched and named long before anyone wrote down who saw it first.</p>
+				} else {
+					<p class="story__big">Found in { year(b.Discovery.Year) }{ by(b) }.</p>
+					if explained, ok := body.Methods[b.Discovery.Method]; ok {
+						<p><b>{ b.Discovery.Method }.</b> { explained }</p>
+					}
+				}
+			</div>
+		</div>
+	</section>
+	if host.Name != "" && !b.InSolarSystem() {
+		<section class="section reveal" aria-labelledby="star-title">
+			<div class="wrap">
+				<header class="section__head">
+					<h2 class="section__title" id="star-title">Its star</h2>
+					<p class="section__lede">{ body.TypeOf(host.Name, host.Star).Description }</p>
+				</header>
+				@components.StarCards([]body.Body{host})
+			</div>
+		</section>
+	}
+	if moons := components.Moons(b, family); len(moons) > 0 {
+		@linksSection("moons-title", "Moons", moons)
+	}
+	if others := components.Neighbours(b, family); len(others) > 0 {
+		@linksSection("family-title", familyTitle(b), others)
+	}
+}
+
+templ starPage(b body.Body, planets []body.Body) {
+	{{ names := body.StarNames(b.Name) }}
+	{{ kind := body.TypeOf(b.Name, b.Star) }}
+	@worldHero(b, starEyebrow(b, names)) {
+		if names.Full != components.DisplayName(b) {
+			<p class="world-hero__aka">{ names.Full }</p>
+		}
+		if aka := otherNames(b, names); len(aka) > 0 {
+			<p class="world-hero__aka">Also catalogued as { joinNames(aka) }</p>
+		}
+		<p class="world-hero__lede"><b>{ kind.Class }.</b> { kind.Description }</p>
+	}
+	<section class="section reveal" aria-labelledby="sky-title">
+		<div class="wrap">
+			<header class="section__head">
+				<h2 class="section__title" id="sky-title">In our sky</h2>
+				<p class="section__lede">How bright it looks from Earth, and when and where to look for it.</p>
+			</header>
+			@components.Facts(components.SkyFacts(b))
+		</div>
+	</section>
+	<section class="section reveal" aria-labelledby="star-facts-title">
+		<div class="wrap">
+			<header class="section__head">
+				<h2 class="section__title" id="star-facts-title">The star</h2>
+				<p class="section__lede">Measured against the Sun.</p>
+			</header>
+			@components.Facts(components.StarFacts(b))
+		</div>
+	</section>
+	if len(planets) > 0 {
+		@linksSection("planets-title", "Its planets", planets)
+	}
+}
+
+templ linksSection(id, title string, bodies []body.Body) {
+	<section class="section reveal" aria-labelledby={ id }>
+		<div class="wrap">
+			<header class="section__head">
+				<h2 class="section__title" id={ id }>{ title }</h2>
+			</header>
+			@components.BodyLinks(bodies)
+		</div>
+	</section>
+}

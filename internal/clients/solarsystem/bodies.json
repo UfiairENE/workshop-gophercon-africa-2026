@@ -1,5 +1,5 @@
 [
-	{ "name": "Sun", "kind": "star", "radiusEarth": 109.1, "massEarth": 333000, "spectralType": "G2 V", "starTempK": 5772, "starRadiusSun": 1 },
+	{ "name": "Sun", "kind": "star", "radiusEarth": 109.1, "massEarth": 333000, "spectralType": "G2 V", "starTempK": 5772, "starRadiusSun": 1, "starMassSun": 1, "starAgeGyr": 4.6, "apparentMagnitude": -26.74 },
 
 	{ "name": "Mercury", "kind": "planet", "parent": "Sun", "radiusEarth": 0.383, "massEarth": 0.0553, "orbitalPeriodDays": 87.97, "semiMajorAxisAU": 0.387, "tempK": 440 },
 	{ "name": "Venus", "kind": "planet", "parent": "Sun", "radiusEarth": 0.949, "massEarth": 0.815, "orbitalPeriodDays": 224.7, "semiMajorAxisAU": 0.723, "tempK": 232 },

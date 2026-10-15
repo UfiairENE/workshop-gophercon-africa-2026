@@ -25,6 +25,7 @@ func New(logger *slog.Logger, config config.Config, bodiesSvc *body.Service) *ht
 
 	mux.Handle("GET /assets/", http.FileServerFS(assetsFs(config.IsProduction())))
 	mux.Handle("GET /{$}", handlers.Home(logger, bodiesSvc))
+	mux.Handle("GET /worlds/{name}", handlers.World(logger, bodiesSvc))
 	mux.Handle("GET /", http.HandlerFunc(handlers.NotFound(logger)))
 
 	return mux

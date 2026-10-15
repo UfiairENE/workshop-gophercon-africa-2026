@@ -26,6 +26,9 @@ type Body struct {
 	SpectralType      string   `json:"spectralType"`
 	StarTempK         *float64 `json:"starTempK"`
 	StarRadiusSun     *float64 `json:"starRadiusSun"`
+	StarMassSun       *float64 `json:"starMassSun"`
+	StarAgeGyr        *float64 `json:"starAgeGyr"`
+	ApparentMagnitude *float64 `json:"apparentMagnitude"`
 	DiscoveredYear    *int     `json:"discoveredYear"`
 	DiscoveredBy      string   `json:"discoveredBy"`
 }

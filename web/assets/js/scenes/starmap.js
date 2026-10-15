@@ -6,7 +6,9 @@ import { dotTexture } from '/assets/js/scenes/planet-material.js';
 const scale = (parsecs) => 1.4 * Math.log10(1 + parsecs);
 
 mount('starmap', function ({ THREE, scene, camera, canvas, still }) {
-	const systems = JSON.parse(document.getElementById('starmap-data').textContent || '[]');
+	const data = JSON.parse(document.getElementById('starmap-data').textContent || '{}');
+	const systems = data.points || [];
+	const names = data.names || [];
 	const section = canvas.closest('[data-scroll-scene]');
 
 	const hot = new THREE.Color('#bfe0f7');
@@ -33,8 +35,7 @@ mount('starmap', function ({ THREE, scene, camera, canvas, still }) {
 
 	const field = new THREE.Group();
 	scene.add(field);
-	field.add(
-		new THREE.Points(
+	const stars = new THREE.Points(
 			geometry,
 			new THREE.PointsMaterial({
 				size: 0.055,
@@ -44,8 +45,8 @@ mount('starmap', function ({ THREE, scene, camera, canvas, still }) {
 				opacity: 0.8,
 				depthWrite: false,
 			}),
-		),
-	);
+		);
+	field.add(stars);
 
 	const sun = new THREE.Sprite(
 		new THREE.SpriteMaterial({ map: dotTexture(THREE, 'rgba(255,207,158,1)', 'rgba(255,207,158,0)'), depthWrite: false, blending: THREE.AdditiveBlending }),
@@ -84,6 +85,51 @@ mount('starmap', function ({ THREE, scene, camera, canvas, still }) {
 		controls.autoRotateSpeed = 0.35;
 	} else {
 		canvas.style.pointerEvents = 'none';
+	}
+
+	// Hovering names a star, and clicking opens its page.
+	const tip = canvas.parentElement.querySelector('.starmap__tip');
+	const raycaster = new THREE.Raycaster();
+	raycaster.params.Points.threshold = 0.08;
+	const mouse = new THREE.Vector2();
+	let hovered = -1;
+	let down = null;
+
+	function pick(e) {
+		const rect = canvas.getBoundingClientRect();
+		mouse.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+		raycaster.setFromCamera(mouse, camera);
+		const hit = raycaster.intersectObject(stars)[0];
+		return hit ? hit.index : -1;
+	}
+
+	if (!touch) {
+		canvas.addEventListener('pointermove', function (e) {
+			hovered = pick(e);
+			if (hovered < 0) {
+				tip.hidden = true;
+				canvas.style.cursor = '';
+				return;
+			}
+			const rect = canvas.getBoundingClientRect();
+			tip.textContent = names[hovered];
+			tip.style.left = e.clientX - rect.left + 14 + 'px';
+			tip.style.top = e.clientY - rect.top + 14 + 'px';
+			tip.hidden = false;
+			canvas.style.cursor = 'pointer';
+		});
+		canvas.addEventListener('pointerleave', function () {
+			tip.hidden = true;
+		});
+		canvas.addEventListener('pointerdown', function (e) {
+			down = [e.clientX, e.clientY];
+		});
+		canvas.addEventListener('pointerup', function (e) {
+			// A drag turns the map; only a click that stayed put opens a star.
+			if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 4) return;
+			const i = pick(e);
+			if (i >= 0) window.location.href = '/worlds/' + encodeURIComponent(names[i]);
+		});
 	}
 
 	let distance = 11;

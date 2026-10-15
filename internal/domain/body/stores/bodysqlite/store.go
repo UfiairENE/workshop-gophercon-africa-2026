@@ -76,10 +76,11 @@ func (s Store) List(ctx context.Context, filter body.ListFilter) ([]body.Body, e
 	return result, nil
 }
 
-// CreateMany saves bodies in a single transaction, skipping any whose
-// key is already stored. One transaction rather than one per row is the
-// difference between a moment and a minute for the full catalogue.
-func (s Store) CreateMany(ctx context.Context, in []body.CreateParams) (int, error) {
+// SaveMany saves bodies in a single transaction, adding new ones and
+// refreshing those whose key is already stored, and reports how many it
+// added. One transaction rather than one per row is the difference
+// between a moment and a minute for the full catalogue.
+func (s Store) SaveMany(ctx context.Context, in []body.CreateParams) (int, error) {
 	tx, err := s.conn.BeginTx(ctx, nil)
 	if err != nil {
 		return 0, err
@@ -87,17 +88,22 @@ func (s Store) CreateMany(ctx context.Context, in []body.CreateParams) (int, err
 	defer func() { _ = tx.Rollback() }()
 
 	q := s.queries.WithTx(tx)
-	added := 0
+	before, err := q.BodyCount(ctx)
+	if err != nil {
+		return 0, err
+	}
 	for _, p := range in {
-		n, err := q.BodyCreate(ctx, toCreateParams(uuid.New(), p))
-		if err != nil {
-			return 0, fmt.Errorf("store: creating %q: %w", p.Key, err)
+		if err := q.BodyUpsert(ctx, toUpsertParams(uuid.New(), p)); err != nil {
+			return 0, fmt.Errorf("store: saving %q: %w", p.Key, err)
 		}
-		added += int(n)
+	}
+	after, err := q.BodyCount(ctx)
+	if err != nil {
+		return 0, err
 	}
 
 	if err := tx.Commit(); err != nil {
 		return 0, err
 	}
-	return added, nil
+	return int(after - before), nil
 }

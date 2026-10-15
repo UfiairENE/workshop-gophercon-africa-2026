@@ -104,6 +104,10 @@ func bodiesCmd(app *app) *cli.Command {
 					if ly, ok := b.Sky.LightYears(); ok {
 						distance = fmt.Sprintf("%s light years", strconv.FormatFloat(ly, 'f', 1, 64))
 					}
+					if b.Kind == body.KindStar {
+						view.Render(app.Printer, starCard(b, distance))
+						return nil
+					}
 					view.Render(app.Printer,
 						view.Card{Title: b.Name, Rows: []printer.KV{
 							{Key: "Kind", Value: b.Kind.String()},
@@ -125,6 +129,48 @@ func bodiesCmd(app *app) *cli.Command {
 			},
 		},
 	}
+}
+
+// starCard describes a star: its names, what kind it is, and how and when to see it.
+func starCard(b body.Body, distance string) view.Card {
+	names := body.StarNames(b.Name)
+	kind := body.TypeOf(b.Name, b.Star)
+
+	brightness, best, where := "—", "—", "—"
+	if m := b.Sky.ApparentMagnitude; m != nil {
+		brightness = fmt.Sprintf("magnitude %.1f, %s", *m, strings.ToLower(body.Brightness(*m)[:1])+body.Brightness(*m)[1:])
+	}
+	if ra := b.Sky.RightAscension; ra != nil {
+		best = "around midnight in " + body.BestMonth(*ra).String()
+	}
+	if dec := b.Sky.Declination; dec != nil {
+		where = body.Visibility(*dec)
+	}
+	output := "—"
+	if l, ok := b.Star.Luminosity(); ok {
+		output = strconv.FormatFloat(l, 'g', 3, 64) + " × the Sun"
+	}
+
+	return view.Card{Title: cmp.Or(names.Proper, names.Full), Rows: []printer.KV{
+		{Key: "Catalogue", Value: strings.Join(append([]string{b.Name}, b.CatalogueNames...), ", ")},
+		{Key: "Full name", Value: names.Full},
+		{Key: "In", Value: cmp.Or(names.Constellation, "—")},
+		{Key: "Kind", Value: kind.Class},
+		{Key: "Shines", Value: output},
+		{Key: "From Earth", Value: brightness},
+		{Key: "Best seen", Value: best},
+		{Key: "Where", Value: where},
+		{Key: "Temperature", Value: measure(b.Star.TempK, 0) + " K"},
+		{Key: "Planets", Value: fmt.Sprint(cmp.Or(deref(b.PlanetsInSystem), 0))},
+		{Key: "Distance", Value: distance},
+	}}
+}
+
+func deref(v *int) int {
+	if v == nil {
+		return 0
+	}
+	return *v
 }
 
 // runBodySeed seeds bodies, from the live archive under --live.

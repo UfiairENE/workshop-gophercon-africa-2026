@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const sample = `pl_name,hostname,sy_pnum,discoverymethod,disc_year,disc_facility,pl_orbper,pl_orbsmax,pl_rade,pl_bmasse,pl_eqt,st_spectype,st_teff,st_rad,ra,dec,sy_dist
-"51 Peg b","51 Peg",1,"Radial Velocity",1995,"Haute-Provence Observatory",4.2307869,0.0527,13.7,146,,"G2 IV",5758.00,1.15,344.3665852,20.7690844,15.4614
+const sample = `pl_name,hostname,sy_pnum,discoverymethod,disc_year,disc_facility,pl_orbper,pl_orbsmax,pl_rade,pl_bmasse,pl_eqt,st_spectype,st_teff,st_rad,ra,dec,sy_dist,sy_snum,sy_vmag,st_lum,st_mass,st_age,hd_name,hip_name
+"51 Peg b","51 Peg",1,"Radial Velocity",1995,"Haute-Provence Observatory",4.2307869,0.0527,13.7,146,,"G2 IV",5758.00,1.15,344.3665852,20.7690844,15.4614,1,5.45,0.136,1.07,10.0,"HD 217014","HIP 113357"
 `
 
 func TestSnapshot(t *testing.T) {
@@ -44,6 +44,9 @@ func TestParse(t *testing.T) {
 		assert.Equal(t, "Haute-Provence Observatory", p.DiscoveryFacility)
 		assert.InDelta(t, 15.4614, *p.DistanceParsecs, 1e-9)
 		assert.Nil(t, p.EquilibriumTempK)
+		assert.InDelta(t, 5.45, *p.ApparentMagnitude, 1e-9)
+		assert.Equal(t, "HD 217014", p.HDName)
+		assert.Equal(t, 1, *p.StarsInSystem)
 	})
 
 	t.Run("Wrong columns", func(t *testing.T) {

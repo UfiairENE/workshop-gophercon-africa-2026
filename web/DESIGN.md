@@ -8,7 +8,14 @@ artwork hanging in the white space.
 ## Pages
 
 - `/`, **Worlds**: planets and stars from the `body` domain (NASA Exoplanet Archive plus the
-  bundled Solar System). Orrery banner, Portraits, Star map, Almanac, Nearest worlds.
+  bundled Solar System). Orrery banner, Portraits, Stars you can see, Star map, Almanac,
+  Nearest worlds. Portraits, star cards, table rows, orrery planets and star-map stars all link
+  to a world's page.
+- `/worlds/{name}`, **one world**: a hero with its name and a large 3D body, then fact grids.
+  A planet or moon gets At a glance, How we know, Its star, and its moons or neighbours. A star
+  gets its names (proper, full and catalogue), what kind of star it is and what that means,
+  In our sky (brightness, best month, where on Earth, constellation, distance), The star, and
+  its planets. The plain-English rules live in `internal/domain/body/sky.go`.
 - Anything unmatched gets the error page with a 404 ("Nothing orbits here.").
 
 ## Colours (`:root` in `assets/css/app.css`)
@@ -49,8 +56,12 @@ wordmark. Never use positive letter-spacing.
 - `starmap.js`: every planet-hosting star at its real direction, with distance log-scaled.
   Scrolling flies the camera in. Drag to turn on desktop. On touch screens dragging is off, so
   the page still scrolls.
+- `world.js`: the large body at the top of a world's page. Planets turn and lean towards the
+  pointer; stars glow, tinted by their temperature.
 - `planet-material.js`: the shared banded pastel planet shader.
-- Hover: cards lift 4–6px, table rows tint `--polar`.
+- Hover: cards lift 4–6px, table rows tint `--polar`, and links in lists slide 6px right.
+- Fact grids: hairline `--ash` cells, a 12px label, a large figure, and a muted note saying
+  what the number means.
 - Reduced motion: scenes draw one still frame, and lifts are off.
 
 ## Avoid

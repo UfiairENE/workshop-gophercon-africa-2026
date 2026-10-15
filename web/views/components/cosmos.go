@@ -79,20 +79,26 @@ func Orrery(bodies []body.Body) []orbiter {
 	return out
 }
 
-// StarMap places each planet-hosting system once: right ascension,
-// declination, distance in parsecs and its star's temperature (0 if unknown).
-func StarMap(bodies []body.Body) [][4]float64 {
-	seen := map[string]bool{}
-	var out [][4]float64
+// starMap is what the star map draws: each planet-hosting star once, as
+// right ascension, declination, distance in parsecs and temperature (0 if
+// unknown), with names alongside for hovering and clicking.
+type starMap struct {
+	Names  []string     `json:"names"`
+	Points [][4]float64 `json:"points"`
+}
+
+// StarMap gathers the stars for the star map.
+func StarMap(bodies []body.Body) starMap {
+	var m starMap
 	for _, b := range bodies {
 		s := b.Sky
-		if b.InSolarSystem() || seen[b.System] || s.RightAscension == nil || s.Declination == nil || s.DistanceParsecs == nil {
+		if b.Kind != body.KindStar || b.InSolarSystem() || s.RightAscension == nil || s.Declination == nil || s.DistanceParsecs == nil {
 			continue
 		}
-		seen[b.System] = true
-		out = append(out, [4]float64{round(*s.RightAscension, 3), round(*s.Declination, 3), round(*s.DistanceParsecs, 2), round(deref(b.Star.TempK), 0)})
+		m.Names = append(m.Names, b.Name)
+		m.Points = append(m.Points, [4]float64{round(*s.RightAscension, 3), round(*s.Declination, 3), round(*s.DistanceParsecs, 2), round(deref(b.Star.TempK), 0)})
 	}
-	return out
+	return m
 }
 
 // Portraits picks our planets, Pluto and a few famous exoplanets to draw up close.

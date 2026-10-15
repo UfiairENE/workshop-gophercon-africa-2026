@@ -38,16 +38,25 @@ templ Home(bodies []body.Body) {
 				<div class="wrap">
 					<header class="section__head">
 						<h2 class="section__title" id="worlds-title">Portraits</h2>
-						<p class="section__lede">Our neighbours, and a few famous strangers. Hover one to set it spinning. Strangers are coloured by how hot they run, from lilac to pink.</p>
+						<p class="section__lede">Our neighbours, and a few famous strangers. Hover one to set it spinning, click it for the full story. Strangers are coloured by how hot they run, from lilac to pink.</p>
 					</header>
 					@components.PortraitGrid(components.Portraits(bodies))
+				</div>
+			</section>
+			<section class="section reveal" id="stars" aria-labelledby="stars-title">
+				<div class="wrap">
+					<header class="section__head">
+						<h2 class="section__title" id="stars-title">Stars you can see</h2>
+						<p class="section__lede">{ components.CountSeeable(bodies) } stars with known planets are bright enough to see without a telescope. Here are the brightest, and the month each is highest around midnight. Lower magnitudes shine brighter.</p>
+					</header>
+					@components.StarCards(components.SeeableStars(bodies, 12))
 				</div>
 			</section>
 			<section class="section reveal" id="starmap" aria-labelledby="starmap-title" data-scroll-scene>
 				<div class="wrap">
 					<header class="section__head">
 						<h2 class="section__title" id="starmap-title">Star map</h2>
-						<p class="section__lede">Every star known to have planets, at its real direction from Earth, nearer ones closer in. Scroll to fly through, drag to turn.</p>
+						<p class="section__lede">Every star known to have planets, at its real direction from Earth, nearer ones closer in. Scroll to fly through, drag to turn, click a star to visit it.</p>
 					</header>
 					@components.StarMapPanel(bodies)
 				</div>
