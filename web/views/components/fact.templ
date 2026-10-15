@@ -1,0 +1,11 @@
+package components
+
+// DidYouKnow shows a fun fact about an animal, or nothing when there isn't one.
+templ DidYouKnow(fact string) {
+	if fact != "" {
+		<p class="fact">
+			<span class="fact__icon" aria-hidden="true">💡</span>
+			<span><strong class="fact__label">Did you know:</strong> { fact }</span>
+		</p>
+	}
+}

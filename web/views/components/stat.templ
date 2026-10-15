@@ -1,0 +1,91 @@
+package components
+
+import (
+	"fmt"
+	"workshop/internal/domain/sighting"
+)
+
+type Bar struct {
+	Label string
+	Count int
+	Href  string
+	Pct   int
+}
+
+func Bars(tallies []sighting.Tally, href func(string) string) []Bar {
+	max := 1
+	for _, t := range tallies {
+		max = max2(max, t.Count)
+	}
+	out := make([]Bar, 0, len(tallies))
+	for _, t := range tallies {
+		b := Bar{Label: t.Name, Count: t.Count, Pct: t.Count * 100 / max}
+		if href != nil {
+			b.Href = href(t.Name)
+		}
+		out = append(out, b)
+	}
+	return out
+}
+
+func max2(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func width(pct int) templ.SafeCSS { return templ.SafeCSS(fmt.Sprintf("--w:%d%%", pct)) }
+
+templ BarList(bars []Bar) {
+	<ol class="bars">
+		for _, b := range bars {
+			<li class="bars__row">
+				if b.Href != "" {
+					<a class="bars__label" href={ templ.URL(b.Href) }>{ b.Label }</a>
+				} else {
+					<span class="bars__label">{ b.Label }</span>
+				}
+				<span class="bars__track"><span class="bars__fill" style={ width(b.Pct) }></span></span>
+				<span class="mono bars__n">{ fmt.Sprint(b.Count) }</span>
+			</li>
+		}
+	</ol>
+}
+
+templ Metric(label string, value string) {
+	<div class="metric">
+		<p class="metric__value">{ value }</p>
+		<p class="mono metric__label">{ label }</p>
+	</div>
+}
+
+templ BigNum(label string, n int) {
+	<div class="bignum">
+		<p class="bignum__n" data-count={ fmt.Sprint(n) }>{ fmt.Sprint(n) }</p>
+		<p class="mono bignum__l">{ label }</p>
+	</div>
+}
+
+templ StripPhoto(s sighting.Sighting) {
+	if src, ok := Cover(s); ok {
+		<a class="strip__item" href={ templ.URL(Href(s)) } tabindex="-1">
+			<img src={ src } alt={ Name(s) } loading="lazy"/>
+			<span>{ Name(s) }</span>
+		</a>
+	}
+}
+
+templ Pillar(kicker, title, href, photo string) {
+	<a class="pillar" href={ templ.URL(href) }>
+		if photo != "" {
+			<img src={ photo } alt="" loading="lazy"/>
+		}
+		<span class="pillar__shade"></span>
+		<span class="pillar__text">
+			<span class="mono">{ kicker }</span>
+			<strong>{ title }</strong>
+			<span class="pillar__go mono">→</span>
+		</span>
+	</a>
+}

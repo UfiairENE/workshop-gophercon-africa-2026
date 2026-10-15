@@ -1,0 +1,28 @@
+package pages
+
+import (
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ GalleryPage(items []sighting.Sighting) {
+	@layout.Base(layout.BaseProps{Title: "Gallery", Active: "gallery", Description: "A photo wall of sightings."}) {
+		<section class="wrap page">
+			<h1>Photo gallery</h1>
+			<p class="lede">Click a photo to enlarge it.</p>
+			<ul class="wall">
+				for _, s := range items {
+					if src, ok := components.Cover(s); ok {
+						<li class="wall__item">
+							<button type="button" data-lightbox={ src } data-caption={ components.Name(s) + " · " + components.Place(s) } data-href={ components.Href(s) }>
+								<img src={ src } alt={ components.Name(s) } loading="lazy"/>
+								<span class="wall__cap">{ components.Name(s) }</span>
+							</button>
+						</li>
+					}
+				}
+			</ul>
+		</section>
+	}
+}

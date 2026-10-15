@@ -1,0 +1,9 @@
+package components
+
+templ HearButton(sound, name string) {
+	<button type="button" class="hear" data-sound={ sound } aria-label={ "Hear the " + name }>
+		<span class="hear__icon" aria-hidden="true">▶</span>
+		<span class="hear__label">Hear the { name }</span>
+		<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+	</button>
+}

@@ -1,43 +1,40 @@
 package components
 
 import (
+	"workshop/internal/domain/sighting"
+	"workshop/internal/domain/species"
+
 	"cmp"
 	"fmt"
 	"slices"
 	"strings"
-
-	"workshop/internal/domain/sighting"
-	"workshop/internal/domain/species"
 )
 
 templ SightingCard(s sighting.Sighting) {
 	<article class="card">
-		<!-- Header -->
-		<header class="card__header">
-			<h2>{ displayName(s.Species) }</h2>
-			if s.Species.ScientificName != "" {
-				<p class="card__scientific">{ s.Species.ScientificName }</p>
-			}
-		</header>
-		<!-- Meta -->
-		<dl class="card__meta">
-			<dt>Seen</dt>
-			<dd>{ s.HappenedAt.Format("2 January 2006") }</dd>
-			<dt>Where</dt>
-			<dd>{ place(s.Location) }</dd>
-			if s.IndividualCount != nil {
-				<dt>Count</dt>
-				<dd>{ individuals(*s.IndividualCount) }</dd>
-			}
-			if s.RecordedBy != "" {
-				<dt>Recorded by</dt>
-				<dd>{ s.RecordedBy }</dd>
-			}
-		</dl>
-		<!-- Gallery -->
-		<div class="card__gallery">
-			@Gallery(s.Media)
-		</div>
+		<a class="card__link" href={ templ.URL(Href(s)) }>
+			<div class="card__photo">
+				if src, ok := Cover(s); ok {
+					<img src={ src } alt={ Name(s) } loading="lazy"/>
+				} else {
+					<span class="card__nophoto mono">no photo</span>
+				}
+				if s.Weather.Condition.Description != "" {
+					<span class="chip chip--float">{ WeatherIcon(s.Weather.Condition.Code) } { Temp(s.Weather.Temperature.Actual) }</span>
+				}
+			</div>
+			<div class="card__body">
+				<p class="mono card__date">{ s.HappenedAt.Format("2 Jan 2006") }</p>
+				<h3>{ Name(s) }</h3>
+				if s.Species.ScientificName != "" {
+					<p class="card__scientific">{ s.Species.ScientificName }</p>
+				}
+				<p class="card__place">{ Place(s) }</p>
+				if s.RecordedBy != "" {
+					<p class="mono card__by">by { s.RecordedBy }</p>
+				}
+			</div>
+		</a>
 	</article>
 }
 

@@ -1,0 +1,16 @@
+package pages
+
+import "workshop/web/views/layout"
+
+templ NotFound() {
+	@layout.Base(layout.BaseProps{Title: "Page not found"}) {
+		<section class="wrap page notfound">
+			<p class="notfound__code">404</p>
+			<h1>Page not found</h1>
+			<p>
+				<a class="btn-orange" href="/">Back to the sightings</a>
+				<a class="button" href="/sightings">All sightings</a>
+			</p>
+		</section>
+	}
+}

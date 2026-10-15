@@ -1,0 +1,31 @@
+package pages
+
+import (
+	"fmt"
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ MapPage(items []sighting.Sighting) {
+	@layout.Base(layout.BaseProps{Title: "Map", Active: "map", Map: true, Description: "Every sighting on a map."}) {
+		{{ sum := sighting.Summarise(items) }}
+		<section class="wrap page">
+			<h1>Every sighting on the map</h1>
+			<p class="lede">{ fmt.Sprint(sum.Sightings) } sightings of { fmt.Sprint(sum.Species) } species in { fmt.Sprint(sum.Countries) } countries.</p>
+			<div class="map-legend" data-map-legend="map-points" role="group" aria-label="Show animal groups">
+				for _, g := range components.MapGroups(items) {
+					<button type="button" class="map-legend__item" data-group={ g.Key } aria-pressed="true" style={ templ.SafeCSS("--c:" + g.Colour) }>
+						<span class="map-legend__icon" aria-hidden="true">{ g.Icon }</span>
+						{ g.Label }
+						<span class="map-legend__count">{ fmt.Sprint(g.Count) }</span>
+					</button>
+				}
+			</div>
+			<div class="map map--tall" data-map="map-points" role="region" aria-label="Map of all sightings">
+				<p class="map__fallback">The map needs JavaScript and a connection to load.</p>
+			</div>
+			@templ.JSONScript("map-points", components.MapPoints(items))
+		</section>
+	}
+}

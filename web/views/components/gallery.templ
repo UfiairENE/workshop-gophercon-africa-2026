@@ -7,19 +7,20 @@ import (
 
 templ Gallery(items []sighting.Media) {
 	if len(items) == 0 {
-		<p class="gallery__empty">No media recorded.</p>
+		<p class="gallery__empty">No photos were recorded for this sighting.</p>
 	} else {
 		<ul class="gallery">
 			for _, m := range items {
-				<!-- Items -->
 				<li class="gallery__item">
 					if m.Type == "StillImage" {
-						<img src={ m.URL } alt={ altText(m) } loading="lazy"/>
+						<button type="button" class="gallery__open" data-lightbox={ m.URL } data-caption={ altText(m) }>
+							<img src={ m.URL } alt={ altText(m) } loading="lazy"/>
+						</button>
 					} else {
 						<a href={ templ.URL(m.URL) } rel="noopener">{ altText(m) }</a>
 					}
 					if m.Creator != "" {
-						<figcaption class="gallery__credit">{ m.Creator }</figcaption>
+						<p class="gallery__credit mono">© { m.Creator }</p>
 					}
 				</li>
 			}
@@ -28,5 +29,5 @@ templ Gallery(items []sighting.Media) {
 }
 
 func altText(m sighting.Media) string {
-	return cmp.Or(m.Title, m.Description, "Sighting media")
+	return cmp.Or(m.Title, m.Description, "Sighting photo")
 }

@@ -1,0 +1,50 @@
+package pages
+
+import (
+	"fmt"
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+type StatsData struct {
+	Summary   sighting.Summary
+	Years     []components.Bar
+	Animals   []components.Bar
+	Countries []components.Bar
+	Warmest   string
+	Average   float64
+}
+
+templ Stats(d StatsData) {
+	@layout.Base(layout.BaseProps{Title: "Statistics", Active: "stats", Description: "Numbers behind the sightings."}) {
+		<section class="wrap page">
+			<h1>Statistics</h1>
+			<p class="lede">
+				{ d.Summary.Earliest.Format("Jan 2006") } to { d.Summary.Latest.Format("Jan 2006") }, from { fmt.Sprint(d.Summary.Recorders) } recorders.
+			</p>
+			<div class="metrics">
+				@components.Metric("sightings", fmt.Sprint(d.Summary.Sightings))
+				@components.Metric("species", fmt.Sprint(d.Summary.Species))
+				@components.Metric("countries", fmt.Sprint(d.Summary.Countries))
+				@components.Metric("animals counted", fmt.Sprint(d.Summary.Individuals))
+				@components.Metric("photos", fmt.Sprint(d.Summary.Media))
+				@components.Metric("average temperature", fmt.Sprintf("%.1f°C", d.Average))
+			</div>
+			<div class="cols">
+				<section class="panel" data-reveal>
+					<h2 class="mono">Most seen animals</h2>
+					@components.BarList(d.Animals)
+				</section>
+				<section class="panel" data-reveal>
+					<h2 class="mono">Top countries</h2>
+					@components.BarList(d.Countries)
+				</section>
+			</div>
+			<section class="panel" data-reveal>
+				<h2 class="mono">Sightings per year</h2>
+				@components.BarList(d.Years)
+			</section>
+		</section>
+	}
+}

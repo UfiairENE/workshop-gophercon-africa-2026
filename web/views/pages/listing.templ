@@ -1,0 +1,28 @@
+package pages
+
+import (
+	"fmt"
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ Listing(kind, title string, sum sighting.Summary, items []sighting.Sighting) {
+	@layout.Base(layout.BaseProps{Title: title, Active: "sightings", Map: true}) {
+		<section class="wrap page">
+			<p class="mono crumbs"><a href="/">Sightings</a> / { kind }</p>
+			<h1>{ title }</h1>
+			<p class="lede">{ fmt.Sprint(sum.Sightings) } sightings · { fmt.Sprint(sum.Species) } species · { fmt.Sprint(sum.Countries) } countries</p>
+			if len(items) > 0 {
+				@components.Map("map-points", components.MapPoints(items), "Sightings of "+title)
+				<ul class="grid grid--spaced">
+					for _, s := range items {
+						<li>
+							@components.SightingCard(s)
+						</li>
+					}
+				</ul>
+			}
+		</section>
+	}
+}

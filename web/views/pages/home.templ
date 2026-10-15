@@ -1,27 +1,171 @@
 package pages
 
 import (
+	"fmt"
 	"workshop/internal/domain/sighting"
 	"workshop/web/views/components"
 	"workshop/web/views/layout"
 )
 
-templ Home(sightings []sighting.Sighting) {
+type HomeData struct {
+	Summary   sighting.Summary
+	Heroes    []sighting.Sighting
+	Groups    []GroupTile
+	Spotlight *components.Profile
+	Quiz      int
+	Countries []CountryTally
+	Latest    []sighting.Sighting
+}
+
+// GroupTile is one animal group on the landing page.
+type GroupTile struct {
+	Group   components.MapGroup
+	Species int
+	Photo   string
+	Cover   string
+}
+
+// CountryTally is one row of the "around the world" ranking.
+type CountryTally struct {
+	Name, Code         string
+	Sightings, Species int
+}
+
+templ Home(d HomeData) {
 	@layout.Base(layout.BaseProps{
-		Title: "Sightings",
+		Title:       "Wildlife sightings from around the world",
+		Description: "Real animal sightings from around the world, with the weather on the day.",
+		Active:      "",
 	}) {
-		<h1>Sightings</h1>
-		if len(sightings) == 0 {
-			<p>No sightings have been ingested yet.</p>
-		} else {
-			<p>Total: { len(sightings) }</p>
-			<ul class="sightings">
-				for _, s := range sightings {
-					<li>
-						@components.SightingCard(s)
-					</li>
+		<div class="banner">
+			<div class="banner__image">
+				for i, h := range d.Heroes {
+					if src, ok := components.Cover(h); ok {
+						<figure class={ "slide", templ.KV("slide--alt", i%2 == 1) } style={ components.SlideStyle(i, len(d.Heroes)) }>
+							<img src={ src } alt={ components.Name(h) } fetchpriority?={ i == 0 }/>
+						</figure>
+					}
 				}
-			</ul>
+			</div>
+			<div class="banner__content">
+				<h1 class="banner__title">Wildlife sightings from around the world</h1>
+				<a class="btn-orange banner__link" href="#sightings">See the sightings</a>
+			</div>
+		</div>
+		<div class="banner__footer">
+			<p class="banner__overview">
+				{ fmt.Sprint(d.Summary.Sightings) } sightings of { fmt.Sprint(d.Summary.Species) } species in { fmt.Sprint(d.Summary.Countries) } countries, each with the weather on the day.
+			</p>
+		</div>
+		if len(d.Groups) > 0 {
+			<section class="explore" id="explore" aria-labelledby="explore-title">
+				<div class="wrap">
+					<p class="eyebrow eyebrow--light">Start exploring</p>
+					<h2 class="explore__title" id="explore-title">Seven ways into the wild</h2>
+				</div>
+				<ul class="explore__grid wrap">
+					for _, t := range d.Groups {
+						<li>
+							<a class="explore__tile" href={ templ.URL(t.Group.Href()) } style={ templ.SafeCSS("--c:" + t.Group.Colour) }>
+								if t.Photo != "" {
+									<img src={ t.Photo } alt="" loading="lazy"/>
+								}
+								<span class="explore__shade"></span>
+								<span class="explore__icon" aria-hidden="true">{ t.Group.Icon }</span>
+								<span class="explore__label">{ t.Group.Label }</span>
+								<span class="explore__meta">{ fmt.Sprint(t.Species) } species · { fmt.Sprint(t.Group.Count) } sightings</span>
+							</a>
+						</li>
+					}
+				</ul>
+			</section>
+		}
+		if p := d.Spotlight; p != nil {
+			<section class="spotlight" aria-labelledby="spotlight-title">
+				<a class="spotlight__photo" href={ templ.URL(p.Href()) } tabindex="-1" aria-hidden="true">
+					<img src={ p.Photo } alt="" loading="lazy"/>
+				</a>
+				<div class="spotlight__body">
+					<p class="eyebrow">Animal of the day</p>
+					<h2 class="spotlight__name" id="spotlight-title">{ p.Name }</h2>
+					<p class="spotlight__sci">{ p.Scientific }</p>
+					<ol class="taxonomy" aria-label="Classification">
+						for _, t := range p.Taxonomy() {
+							<li>{ t }</li>
+						}
+					</ol>
+					@components.DidYouKnow(p.Fact)
+					<dl class="spotlight__stats">
+						<div><dt>Sightings</dt><dd>{ fmt.Sprint(p.Sightings) }</dd></div>
+						<div><dt>Countries</dt><dd>{ fmt.Sprint(p.Countries) }</dd></div>
+						<div><dt>Last seen</dt><dd>{ p.Last.Format("Jan 2006") }</dd></div>
+					</dl>
+					<p class="spotlight__actions">
+						<a class="btn-orange" href={ templ.URL(p.Href()) }>Meet the { p.Name }</a>
+						<a class="button" href={ templ.URL(p.Group.Href()) }>More { p.Group.Label }</a>
+					</p>
+				</div>
+			</section>
+		}
+		if d.Quiz >= 4 {
+			<section class="quizband">
+				<div class="wrap quizband__inner">
+					<div class="quizband__wave" aria-hidden="true">
+						for i := 0; i < 24; i++ {
+							<i style={ templ.SafeCSS(fmt.Sprintf("--i:%d", i)) }></i>
+						}
+					</div>
+					<div>
+						<h2 class="quizband__title">Can you name it by ear?</h2>
+						<p class="quizband__text">{ fmt.Sprint(d.Quiz) } real recordings from the wild, plus clue and photo quizzes. Guess, then learn something about each animal.</p>
+					</div>
+					<a class="quizband__cta" href="/quiz">Play the quizzes →</a>
+				</div>
+			</section>
+		}
+		if len(d.Countries) > 0 {
+			<section class="world wrap" aria-labelledby="world-title">
+				<div class="world__intro">
+					<p class="eyebrow">Around the world</p>
+					<h2 id="world-title">{ fmt.Sprint(d.Summary.Countries) } countries, from the Arctic to Antarctica</h2>
+					<p>Every sighting is pinned where it happened. See which animals turn up where, or find what has been seen near you.</p>
+					<p class="world__actions">
+						<a class="btn-orange" href="/map">Open the map</a>
+						<a class="button" href="/near">Near me</a>
+					</p>
+				</div>
+				<ol class="world__list">
+					for _, c := range d.Countries {
+						<li>
+							<a href={ templ.URL("/countries/" + c.Code) }>
+								<span class="world__name">{ c.Name }</span>
+								<span class="world__bar" style={ templ.SafeCSS(fmt.Sprintf("--w:%d%%", c.Sightings*100/d.Countries[0].Sightings)) }></span>
+								<span class="world__count">{ fmt.Sprint(c.Sightings) } sightings · { fmt.Sprint(c.Species) } species</span>
+							</a>
+						</li>
+					}
+				</ol>
+			</section>
+		}
+		if len(d.Latest) > 0 {
+			<section class="fresh" id="sightings" aria-labelledby="fresh-title">
+				<div class="wrap">
+					<div class="fresh__head">
+						<div>
+							<p class="eyebrow">Fresh from the field</p>
+							<h2 id="fresh-title">Latest sightings</h2>
+						</div>
+						<a class="button" href="/sightings">Browse all { fmt.Sprint(d.Summary.Sightings) } →</a>
+					</div>
+					<ul class="grid">
+						for _, s := range d.Latest {
+							<li>
+								@components.SightingCard(s)
+							</li>
+						}
+					</ul>
+				</div>
+			</section>
 		}
 	}
 }

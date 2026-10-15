@@ -1,0 +1,87 @@
+package pages
+
+import (
+	"fmt"
+	"net/url"
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+type SightingsData struct {
+	Query   string
+	Group   string
+	Groups  []components.MapGroup
+	Total   int
+	Items   []sighting.Sighting
+	Page    int
+	HasMore bool
+}
+
+// sightingsURL keeps the current search when moving between filters and pages.
+func sightingsURL(q, group string, page int) templ.SafeURL {
+	v := url.Values{}
+	if q != "" {
+		v.Set("q", q)
+	}
+	if group != "" {
+		v.Set("group", group)
+	}
+	if page > 1 {
+		v.Set("page", fmt.Sprint(page))
+	}
+	if len(v) == 0 {
+		return "/sightings"
+	}
+	return templ.SafeURL("/sightings?" + v.Encode())
+}
+
+templ Sightings(d SightingsData) {
+	@layout.Base(layout.BaseProps{Title: "Sightings", Active: "sightings", Description: "Browse and search every wildlife sighting."}) {
+		<section class="wrap page">
+			<h1>Sightings</h1>
+			<form action="/sightings" method="get" class="searchbar">
+				if d.Group != "" {
+					<input type="hidden" name="group" value={ d.Group }/>
+				}
+				<input type="search" name="q" value={ d.Query } placeholder="Animal, place or recorder" aria-label="Search sightings"/>
+				<button class="btn-orange" type="submit">Search</button>
+			</form>
+			<nav class="filters" aria-label="Filter by animal group">
+				<a href={ sightingsURL(d.Query, "", 1) } class="filters__item" aria-current?={ d.Group == "" }>All</a>
+				for _, g := range d.Groups {
+					<a href={ sightingsURL(d.Query, g.Key, 1) } class="filters__item" style={ templ.SafeCSS("--c:" + g.Colour) } aria-current?={ d.Group == g.Key }>
+						<span aria-hidden="true">{ g.Icon }</span> { g.Label }
+					</a>
+				}
+			</nav>
+			<p class="count">
+				{ fmt.Sprint(d.Total) } sightings
+				if d.Query != "" {
+					{ "for “" + d.Query + "”" }
+				}
+			</p>
+			if len(d.Items) > 0 {
+				<ul class="grid">
+					for _, s := range d.Items {
+						<li>
+							@components.SightingCard(s)
+						</li>
+					}
+				</ul>
+			} else {
+				<p class="lede">Nothing matches. Try another animal or place.</p>
+			}
+			if d.Page > 1 || d.HasMore {
+				<nav class="pager" aria-label="Pages">
+					if d.Page > 1 {
+						<a class="button" href={ sightingsURL(d.Query, d.Group, d.Page-1) }>← Newer</a>
+					}
+					if d.HasMore {
+						<a class="button" href={ sightingsURL(d.Query, d.Group, d.Page+1) }>Older →</a>
+					}
+				</nav>
+			}
+		</section>
+	}
+}

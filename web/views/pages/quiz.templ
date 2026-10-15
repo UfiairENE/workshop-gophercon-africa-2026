@@ -1,0 +1,52 @@
+package pages
+
+import (
+	"fmt"
+	"workshop/web/views/layout"
+)
+
+type QuizAnimal struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Photo string `json:"photo"`
+	Group string `json:"group"`
+	Genus string `json:"genus"`
+	Sound string `json:"sound,omitzero"`
+	Fact  string `json:"fact,omitzero"`
+	Href  string `json:"href"`
+}
+
+type quizMode struct{ Key, Icon, Title, Text string }
+
+func quizModes(sounds, facts, photos int) []quizMode {
+	return []quizMode{
+		{"sound", "🔊", "Who made that sound?", fmt.Sprintf("%d real recordings. Listen, then pick the animal.", sounds)},
+		{"fact", "💡", "Who am I?", fmt.Sprintf("%d facts with the name hidden. Read the clue, then pick the animal.", facts)},
+		{"photo", "📷", "Name that animal", fmt.Sprintf("%d species. See the photo, then pick its name from look-alikes.", photos)},
+	}
+}
+
+templ Quiz(animals []QuizAnimal, sounds, facts int) {
+	@layout.Base(layout.BaseProps{Title: "Quizzes", Active: "quiz", Description: "Test what you know about the animals in the sightings."}) {
+		<section class="wrap page quiz-page" data-quiz>
+			<p class="eyebrow">Quizzes</p>
+			<h1>How well do you know the wild?</h1>
+			<div class="quizmodes" role="tablist" aria-label="Choose a quiz">
+				for i, m := range quizModes(sounds, facts, len(animals)) {
+					<button type="button" class="quizmode" role="tab" data-mode={ m.Key } aria-selected={ fmt.Sprint(i == 0) }>
+						<span class="quizmode__icon" aria-hidden="true">{ m.Icon }</span>
+						<span class="quizmode__title">{ m.Title }</span>
+						<span class="quizmode__text">{ m.Text }</span>
+					</button>
+				}
+			</div>
+			<p class="quiz__status" data-quiz-status></p>
+			<div class="quiz" data-quiz-stage>
+				<noscript><p>The quizzes need JavaScript.</p></noscript>
+			</div>
+			<p class="sr-only" data-quiz-live aria-live="polite"></p>
+			<p class="quiz__note">Recordings from Wikimedia Commons and NOAA Fisheries. <a href="/credits">Credits</a></p>
+			@templ.JSONScript("quiz-data", animals)
+		</section>
+	}
+}

@@ -1,0 +1,66 @@
+package pages
+
+import (
+	"fmt"
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ Animal(p components.Profile, items []sighting.Sighting, related []components.Profile) {
+	@layout.Base(layout.BaseProps{Title: p.Name, Active: "sightings", Map: true, Description: p.Fact}) {
+		<article class="wrap page animal">
+			<p class="mono crumbs"><a href="/#explore">Explore</a> / <a href={ templ.URL(p.Group.Href()) }>{ p.Group.Label }</a> / { p.Name }</p>
+			<div class="animal__head">
+				if p.Photo != "" {
+					<div class="animal__photo">
+						<img src={ p.Photo } alt={ p.Name }/>
+					</div>
+				}
+				<div class="animal__intro">
+					<h1 class="animal__name">{ p.Name }</h1>
+					<p class="spotlight__sci">{ p.Scientific }</p>
+					<ol class="taxonomy" aria-label="Classification">
+						for _, t := range p.Taxonomy() {
+							<li>{ t }</li>
+						}
+					</ol>
+					@components.DidYouKnow(p.Fact)
+					<dl class="spotlight__stats">
+						<div><dt>Sightings</dt><dd>{ fmt.Sprint(p.Sightings) }</dd></div>
+						<div><dt>Countries</dt><dd>{ fmt.Sprint(p.Countries) }</dd></div>
+						if p.Individuals > 0 {
+							<div><dt>Animals counted</dt><dd>{ fmt.Sprint(p.Individuals) }</dd></div>
+						}
+					</dl>
+					<p class="animal__span">Seen between { p.First.Format("January 2006") } and { p.Last.Format("January 2006") }.</p>
+					if p.Sound != "" {
+						<p class="hear-wrap">
+							@components.HearButton(p.Sound, p.Name)
+						</p>
+					}
+				</div>
+			</div>
+			<h2 class="section-title--sm">Where it has been seen</h2>
+			@components.Map("map-points", components.MapPoints(items), "Where the "+p.Name+" has been seen")
+			<h2 class="section-title--sm">Every sighting</h2>
+			<ul class="visits">
+				for _, s := range items {
+					<li>
+						@components.VisitCard(s)
+					</li>
+				}
+			</ul>
+			if len(related) > 0 {
+				<h2 class="section-title--sm">Explore related animals</h2>
+				<ul class="species-grid species-grid--spaced">
+					for _, r := range related {
+						<li>
+							@components.SpeciesCard(r)
+						</li>
+					}
+				</ul>
+			}
+		</article>
+	}
+}

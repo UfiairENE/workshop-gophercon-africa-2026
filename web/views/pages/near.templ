@@ -1,0 +1,20 @@
+package pages
+
+import (
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ Near(points []components.MapPoint) {
+	@layout.Base(layout.BaseProps{Title: "Near me", Active: "near", Description: "The sightings closest to where you are."}) {
+		<section class="wrap page" data-near>
+			<p class="eyebrow">Near me</p>
+			<h1>Sightings near you</h1>
+			<p class="lede">Your location stays in your browser.</p>
+			<p><button type="button" class="btn-orange" data-near-go>Use my location</button></p>
+			<p class="quiz__status" data-near-status aria-live="polite"></p>
+			<ol class="nearlist" data-near-results></ol>
+			@templ.JSONScript("near-points", points)
+		</section>
+	}
+}

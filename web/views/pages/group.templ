@@ -1,0 +1,38 @@
+package pages
+
+import (
+	"fmt"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ Group(g components.MapGroup, species []components.Profile, others []components.MapGroup) {
+	@layout.Base(layout.BaseProps{Title: g.Label, Active: "sightings", Description: g.Blurb}) {
+		<section class="grouphead" style={ templ.SafeCSS("--c:" + g.Colour) }>
+			<div class="wrap">
+				<p class="mono crumbs crumbs--light"><a href="/#explore">Explore</a> / { g.Label }</p>
+				<p class="grouphead__icon" aria-hidden="true">{ g.Icon }</p>
+				<h1>{ g.Label }</h1>
+				<p class="grouphead__blurb">{ g.Blurb }</p>
+				<p class="grouphead__meta">{ fmt.Sprint(len(species)) } species · { fmt.Sprint(g.Count) } sightings</p>
+			</div>
+		</section>
+		<section class="wrap page">
+			<ul class="species-grid">
+				for _, p := range species {
+					<li>
+						@components.SpeciesCard(p)
+					</li>
+				}
+			</ul>
+			<nav class="groupnav" aria-label="Other groups">
+				<h2 class="eyebrow">Keep exploring</h2>
+				<ul>
+					for _, o := range others {
+						<li><a href={ templ.URL(o.Href()) } style={ templ.SafeCSS("--c:" + o.Colour) }><span aria-hidden="true">{ o.Icon }</span> { o.Label }</a></li>
+					}
+				</ul>
+			</nav>
+		</section>
+	}
+}

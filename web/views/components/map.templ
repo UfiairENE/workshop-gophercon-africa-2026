@@ -1,0 +1,8 @@
+package components
+
+templ Map(id string, points []MapPoint, label string) {
+	<div class="map" data-map={ id } data-cluster role="region" aria-label={ label }>
+		<p class="map__fallback">The map needs JavaScript and a connection to load.</p>
+	</div>
+	@templ.JSONScript(id, points)
+}

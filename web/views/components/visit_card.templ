@@ -1,0 +1,30 @@
+package components
+
+import "workshop/internal/domain/sighting"
+
+// VisitCard is one sighting on its species' page, so it leads with where and
+// when rather than repeating the animal's name.
+templ VisitCard(s sighting.Sighting) {
+	<a class="visit" href={ templ.URL(Href(s)) }>
+		<span class="visit__photo">
+			if src, ok := Cover(s); ok {
+				<img src={ src } alt="" loading="lazy"/>
+			}
+		</span>
+		<span class="visit__body">
+			<span class="visit__place">{ Place(s) }</span>
+			<span class="visit__meta">
+				{ s.HappenedAt.Format("2 Jan 2006") }
+				if s.Weather.Condition.Description != "" {
+					· { WeatherIcon(s.Weather.Condition.Code) } { Temp(s.Weather.Temperature.Actual) }
+				}
+				if c := Count(s); c != "" {
+					· { c }
+				}
+			</span>
+			if s.RecordedBy != "" {
+				<span class="visit__by">by { s.RecordedBy }</span>
+			}
+		</span>
+	</a>
+}

@@ -1,0 +1,27 @@
+package components
+
+import "fmt"
+
+// SpeciesCard introduces one species: what it is, a fact, and how often it was seen.
+templ SpeciesCard(p Profile) {
+	<article class="spcard" style={ templ.SafeCSS("--c:" + p.Group.Colour) }>
+		<a class="spcard__link" href={ templ.URL(p.Href()) }>
+			<div class="spcard__photo">
+				if p.Photo != "" {
+					<img src={ p.Photo } alt={ p.Name } loading="lazy"/>
+				}
+				<span class="spcard__count">{ fmt.Sprint(p.Sightings) } sightings</span>
+			</div>
+			<div class="spcard__body">
+				<h3>{ p.Name }</h3>
+				<p class="card__scientific">{ p.Scientific }</p>
+				if p.Family != "" {
+					<p class="spcard__family">Family { p.Family }</p>
+				}
+				if p.Fact != "" {
+					<p class="spcard__fact">{ p.Fact }</p>
+				}
+			</div>
+		</a>
+	</article>
+}

@@ -1,0 +1,121 @@
+package pages
+
+import (
+	"fmt"
+	"workshop/internal/domain/sighting"
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ Sighting(s sighting.Sighting) {
+	@layout.Base(layout.BaseProps{
+		Title:       components.Name(s),
+		Description: components.Name(s) + " seen in " + components.Place(s),
+		Active:      "sightings",
+		Map:         true,
+	}) {
+		<article class="wrap detail page">
+			<p class="mono crumbs"><a href="/">Sightings</a> / { components.Name(s) }</p>
+			<div class="detail__head">
+				<h1>{ components.Name(s) }</h1>
+				if s.Species.ScientificName != "" {
+					<p class="card__scientific">{ s.Species.ScientificName }</p>
+				}
+				<p class="lede">{ s.HappenedAt.Format("Monday 2 January 2006") } · { components.Place(s) }</p>
+				<p class="tags">
+					if s.Species.CanonicalName != "" || s.Species.VernacularName != "" {
+						<a class="chip" href={ templ.URL(fmt.Sprintf("/animals/%d", s.Species.GBIFKey)) }>More { components.Name(s) } →</a>
+					}
+					if s.Location.CountryCode != "" {
+						<a class="chip" href={ templ.URL("/countries/" + s.Location.CountryCode.String()) }>{ s.Location.Country } →</a>
+					}
+				</p>
+			</div>
+			<p class="hear-wrap">
+				if snd := components.SoundFor(s); snd != "" {
+					@components.HearButton(snd, components.Name(s))
+				}
+				<button
+					type="button"
+					class="hear hear--ghost"
+					data-poster
+					data-name={ components.Name(s) }
+					data-sci={ s.Species.ScientificName }
+					data-place={ components.Place(s) }
+					data-date={ s.HappenedAt.Format("2 January 2006") }
+					data-temp={ components.Temp(s.Weather.Temperature.Actual) }
+					data-cond={ s.Weather.Condition.Description }
+					data-photo={ photoOf(s) }
+				>
+					<span class="hear__icon" aria-hidden="true">↓</span>
+					<span class="hear__label">Download poster</span>
+				</button>
+			</p>
+			@components.DidYouKnow(components.Fact(s))
+			<div class="detail__cols">
+				<div>
+					@components.Gallery(s.Media)
+				</div>
+				<aside class="stack">
+					<section class="panel weather">
+						<h2 class="mono">Weather that day</h2>
+						<p class="weather__big">
+							<span class="weather__icon" aria-hidden="true">{ components.WeatherIcon(s.Weather.Condition.Code) }</span>
+							{ components.Temp(s.Weather.Temperature.Actual) }
+						</p>
+						<p class="weather__desc">{ s.Weather.Condition.Description }</p>
+						<dl class="facts">
+							<dt>Feels like</dt>
+							<dd>{ components.Temp(s.Weather.Temperature.Apparent) }</dd>
+							<dt>Wind</dt>
+							<dd>{ fmt.Sprintf("%.0f km/h %s", s.Weather.Wind.Speed, components.Compass(s.Weather.Wind.Direction)) }</dd>
+							<dt>Humidity</dt>
+							<dd>{ fmt.Sprintf("%d%%", s.Weather.Humidity) }</dd>
+							<dt>Cloud cover</dt>
+							<dd>{ fmt.Sprintf("%d%%", s.Weather.CloudCover) }</dd>
+							<dt>Rain</dt>
+							<dd>{ fmt.Sprintf("%.1f mm", s.Weather.Precipitation.Total) }</dd>
+						</dl>
+					</section>
+					<section class="panel">
+						<h2 class="mono">The record</h2>
+						<dl class="facts">
+							if c := components.Count(s); c != "" {
+								<dt>Seen</dt>
+								<dd>{ c }</dd>
+							}
+							if s.RecordedBy != "" {
+								<dt>Recorded by</dt>
+								<dd>{ s.RecordedBy }</dd>
+							}
+							if s.Species.Family != "" {
+								<dt>Family</dt>
+								<dd>{ s.Species.Family }</dd>
+							}
+							if s.Species.Class != "" {
+								<dt>Class</dt>
+								<dd>{ s.Species.Class }</dd>
+							}
+							<dt>Position</dt>
+							<dd class="mono">{ fmt.Sprintf("%.3f, %.3f", s.Location.Latitude, s.Location.Longitude) }</dd>
+						</dl>
+						if s.Remarks != "" {
+							<p class="remarks">{ s.Remarks }</p>
+						}
+						if s.ReferenceURL != "" {
+							<p><a class="mono" href={ templ.URL(s.ReferenceURL) } rel="noopener">View on GBIF →</a></p>
+						}
+					</section>
+				</aside>
+			</div>
+			<h2 class="section-title">Where this { components.Name(s) } was seen</h2>
+			<p class="lede">{ components.Name(s) } · { components.Place(s) } · { s.HappenedAt.Format("2 January 2006") }</p>
+			@components.Map("map-points", components.MapPoints([]sighting.Sighting{s}), "Where this "+components.Name(s)+" was seen")
+		</article>
+	}
+}
+
+func photoOf(s sighting.Sighting) string {
+	src, _ := components.Cover(s)
+	return src
+}

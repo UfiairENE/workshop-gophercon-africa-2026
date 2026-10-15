@@ -1,0 +1,36 @@
+package pages
+
+import (
+	"workshop/web/views/components"
+	"workshop/web/views/layout"
+)
+
+templ Credits() {
+	@layout.Base(layout.BaseProps{Title: "Credits"}) {
+		<section class="wrap page">
+			<h1>Credits</h1>
+			<p class="lede">Recordings are from Wikimedia Commons and NOAA Fisheries. Video is from Wikimedia Commons. Sightings and photos are from GBIF.</p>
+			<h2 class="section-title--sm">Video</h2>
+			<ul class="credits">
+				for _, c := range credits {
+					<li>
+						<strong>{ c.Used }</strong>
+						<a href={ templ.URL(c.URL) } rel="noopener">{ c.Title }</a>
+						<span>{ c.Author } · { c.Licence }</span>
+					</li>
+				}
+			</ul>
+			<h2 class="section-title--sm">Animal recordings</h2>
+			<ul class="credits">
+				for _, r := range components.Recordings() {
+					<li>
+						<strong>{ r.Animal }</strong>
+						<a href={ templ.URL(r.URL) } rel="noopener">{ r.Title }</a>
+						<span>{ r.Author } · { r.Licence }</span>
+					</li>
+				}
+			</ul>
+			<p class="quiz__note">Whale calls below human hearing are sped up so you can hear them.</p>
+		</section>
+	}
+}
