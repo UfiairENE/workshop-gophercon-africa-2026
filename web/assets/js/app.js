@@ -25,16 +25,23 @@
 	if (heroBox && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 		fetch('/assets/video/hero.mp4', { method: 'HEAD' }).then((r) => {
 			if (!r.ok || !/video/.test(r.headers.get('content-type') || '')) return;
+			// Phones only autoplay a video that is muted and inline before it has a
+			// source, and don't buffer until asked to play, so play straight away
+			// and show it once frames are actually moving.
 			const v = document.createElement('video');
 			v.className = 'banner__video';
-			v.src = '/assets/video/hero.mp4';
 			v.muted = true;
+			v.defaultMuted = true;
+			v.playsInline = true;
 			v.loop = true;
 			v.autoplay = true;
-			v.playsInline = true;
+			['muted', 'playsinline', 'autoplay', 'loop'].forEach((a) => v.setAttribute(a, ''));
 			v.setAttribute('aria-hidden', 'true');
-			v.addEventListener('canplay', () => { heroBox.classList.add('has-video'); v.play().catch(() => {}); }, { once: true });
+			v.preload = 'auto';
+			v.src = '/assets/video/hero.mp4';
+			v.addEventListener('playing', () => heroBox.classList.add('has-video'), { once: true });
 			heroBox.appendChild(v);
+			v.play().catch(() => {});
 		}).catch(() => {});
 	}
 
