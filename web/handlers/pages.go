@@ -284,7 +284,7 @@ func Quiz(logger *slog.Logger, lister SightingsLister) http.HandlerFunc {
 			}
 			out = append(out, a)
 		}
-		render(w, r, logger, pages.Quiz(out, len(sounds), facts))
+		render(w, r, logger, pages.Quiz(out, facts))
 	}
 }
 

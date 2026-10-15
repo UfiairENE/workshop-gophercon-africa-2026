@@ -26,15 +26,15 @@ type QuizAnimal struct {
 
 type quizMode struct{ Key, Icon, Title, Text string }
 
-func quizModes(sounds, facts, photos int) []quizMode {
+func quizModes(facts, photos int) []quizMode {
 	return []quizMode{
-		{"sound", "🔊", "Who made that sound?", fmt.Sprintf("%d real recordings. Listen, then pick the animal.", sounds)},
+		{"sound", "🔊", "Who made that sound?", "Listen, then pick the animal."},
 		{"fact", "💡", "Who am I?", fmt.Sprintf("%d facts with the name hidden. Read the clue, then pick the animal.", facts)},
 		{"photo", "📷", "Name that animal", fmt.Sprintf("%d species. See the photo, then pick its name from look-alikes.", photos)},
 	}
 }
 
-func Quiz(animals []QuizAnimal, sounds, facts int) templ.Component {
+func Quiz(animals []QuizAnimal, facts int) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -71,7 +71,7 @@ func Quiz(animals []QuizAnimal, sounds, facts int) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for i, m := range quizModes(sounds, facts, len(animals)) {
+			for i, m := range quizModes(facts, len(animals)) {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<button type=\"button\" class=\"quizmode\" role=\"tab\" data-mode=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
